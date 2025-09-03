@@ -14,8 +14,12 @@ class PessoaResource extends JsonResource
             'email' => $this->email ?? null,
             'documento' => $this->documento ?? null,
             'telefone' => $this->telefone ?? null,
+            'role' => $this->role ?? null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'professor' => new PessoaResource($this->whenLoaded('teacher')),
+            'client' => new PessoaResource($this->whenLoaded('client')),
+
         ];
     }
 }

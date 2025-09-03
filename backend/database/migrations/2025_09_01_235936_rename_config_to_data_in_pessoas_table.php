@@ -6,19 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        //
+        Schema::table('pessoas', function (Blueprint $table) {
+            $table->renameColumn('config', 'data');
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        //
+        Schema::table('pessoas', function (Blueprint $table) {
+            $table->renameColumn('data', 'config');
+        });
     }
 };

@@ -13,10 +13,8 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'email' => $this->email,
-            'avatar' => $this->avatar,
             'ativado' => $this->deleted_at === null,
-            'pessoa' => new PessoaResource($this->whenLoaded('pessoa')),
-            'role' => $this->role,
+            'pessoa' => new PessoaResource($this->whenLoaded('pessoa'))
         ];
     }
 }

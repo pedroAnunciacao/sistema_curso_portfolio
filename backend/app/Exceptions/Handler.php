@@ -2,13 +2,51 @@
 
 namespace App\Exceptions;
 
-use Exception;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
-class Handler extends Exception
+class Handler extends ExceptionHandler
 {
-    protected function unauthenticated($request, AuthenticationException $exception)
+    protected $dontReport = [];
+
+    protected $dontFlash = [
+        'password',
+        'password_confirmation',
+    ];
+
+    public function register(): void
     {
-        return response()->json(['error' => 'Não autenticado'], 401);
+        //
+    }
+
+    public function render($request, Throwable $e)
+    {
+        // Sempre responde JSON em rotas de API
+        if ($request->is('api/*')) {
+
+            if ($e instanceof ValidationException) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+
+            if ($e instanceof AuthenticationException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Não autenticado.',
+                ], 401);
+            }
+
+            // fallback para qualquer outro erro
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
+        return parent::render($request, $e);
     }
 }

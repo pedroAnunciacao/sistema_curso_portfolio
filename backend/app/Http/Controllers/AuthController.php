@@ -16,17 +16,16 @@ class AuthController extends Controller
      */
     public function login()
     {
-        $request = Request::create(request()->getSchemeAndHttpHost().'/oauth/token', 'POST', [
+        $request = Request::create(request()->getSchemeAndHttpHost() . '/oauth/token', 'POST', [
             'grant_type' => 'password',
-            'client_id' => '0198fe0f-a577-737a-b8fc-ac210886f7d4',
-            'client_secret' => 'YNgIVgqobQwb5yem58ekZNSwQtbELhtyfRaTp0Yc',
+            'client_id' => env('PASSPORT_CLIENT_ID'),
+            'client_secret' => env('PASSPORT_CLIENT_SECRET'),
             'username' => request('username'),
             'password' => request('password'),
         ]);
 
         $response = app()->handle($request);
         $content = json_decode($response->getContent());
-
         if (!$response->isOk()) {
             return response()->json(['error' => $content->error], $response->getStatusCode());
         }
@@ -45,6 +44,15 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         $user = $request->user()->loadMissing('pessoa');
+
+        if ($user->pessoa->role == 'teacher') {
+            $user->load('pessoa.client');
+        }
+
+        if ($user->pessoa->role == 'student') {
+            $user->load('pessoa.teacher.client');
+        }
+
         return new UserResource($user);
     }
 }

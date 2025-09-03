@@ -17,6 +17,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'pessoa_id'
     ];
 
     protected $hidden = [
@@ -36,4 +37,5 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Pessoa::class);
     }
+    
 }

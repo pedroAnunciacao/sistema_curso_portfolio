@@ -12,7 +12,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id')->autoIncrement();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->unsignedBigInteger('pessoa_id'); // professor
+            $table->unsignedBigInteger('pessoa_id');
             $table->timestamps();
             $table->softDeletes();
 
