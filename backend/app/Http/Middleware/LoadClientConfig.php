@@ -9,9 +9,9 @@ class LoadClientConfig
 {
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->check()) {
-            $client = app('client');
-            $client->loadConfig(auth()->user()->pessoa_id);
+        if (auth()->check() && $request->client_id) {
+            // Injeta o client_id obtido do BindRequestFilter
+            app('client')->loadConfig($request->client_id);
         }
 
         return $next($request);

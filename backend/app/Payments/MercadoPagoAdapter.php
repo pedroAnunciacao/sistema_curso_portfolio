@@ -19,7 +19,7 @@ class MercadoPagoAdapter implements PaymentGatewayInterface
 
     public function __construct()
     {
-        $access_token = app('client')->gateways('payments.integrations.gateways.mercado_pago.access_token');
+        $access_token = app('client')->gateways('config.payments.integrations.gateways.mercado_pago.access_token');
         MercadoPagoConfig::setAccessToken($access_token);
         $this->client = new PaymentClient();
     }
@@ -84,7 +84,7 @@ class MercadoPagoAdapter implements PaymentGatewayInterface
 
             $response = Http::get('https://api.mercadopago.com/v1/payment_methods/search', [
                 'bin'        => $bin,
-                'public_key' => app('client')->gateways('payments.integrations.gateways.mercado_pago.public_key')
+                'public_key' => app('client')->gateways('config.payments.integrations.gateways.mercado_pago.public_key')
             ])->json();
 
             $cardPaymentMethod = null;

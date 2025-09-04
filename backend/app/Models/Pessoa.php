@@ -5,12 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Concerns\BelongsToPessoa;
-use Stancl\VirtualColumn\VirtualColumn;
 
 class Pessoa extends Model
 {
-    use HasFactory, SoftDeletes, BelongsToPessoa, VirtualColumn;
+    use HasFactory, SoftDeletes;
 
     public function user()
     {
@@ -27,35 +25,37 @@ class Pessoa extends Model
         return $this->hasMany(Contato::class);
     }
 
-
+    public function client()
+    {
+        return $this->hasOne(Client::class);
+    }
 
     public function teacher()
     {
-        return $this->belongsTo(Pessoa::class, 'pessoa_id')->where('role', 'teacher');
+        return $this->hasOne(Teacher::class);
+    }
+
+    public function student()
+    {
+        return $this->hasOne(Student::class);
     }
 
 
-    public function client()
+    public function getClienteIdAttribute()
     {
-        return $this->belongsTo(Pessoa::class, 'pessoa_id')->where('role', 'client');
-    }
-
-
-    public function aluno()
-    {
-        return $this->hasMany(Pessoa::class, 'pessoa_id')->where('role', 'student');
-    }
-    public function resolveConfig(): array
-    {
-        if ($this->role === 'teacher' && $this->client) {
-            return $this->client->config ?? [];
+        if ($this->student) {
+            return $this->student->cliente_id;
         }
 
-        if ($this->role === 'student' && $this->teacher && $this->teacher->client) {
-            return $this->teacher->client->config ?? [];
+        if ($this->teacher) {
+            return $this->teacher->id;
         }
 
-        return [];
+        if ($this->client) {
+            return $this->client->id;
+        }
+
+        return null;
     }
 
 

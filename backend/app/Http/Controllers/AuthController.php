@@ -45,14 +45,6 @@ class AuthController extends Controller
     {
         $user = $request->user()->loadMissing('pessoa');
 
-        if ($user->pessoa->role == 'teacher') {
-            $user->load('pessoa.client');
-        }
-
-        if ($user->pessoa->role == 'student') {
-            $user->load('pessoa.teacher.client');
-        }
-
         return new UserResource($user);
     }
 }

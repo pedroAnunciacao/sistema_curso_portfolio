@@ -54,9 +54,9 @@ class CourseRepository
         return new CourseResource($course->load(['professor', 'lessons', 'students']));
     }
 
-    public function store($request)
+    public function store(array $courseFormData)
     {
-        $course = $this->model->create($request->course);
+        $course = $this->model->create($courseFormData);
 
         return new CourseResource($course);
     }

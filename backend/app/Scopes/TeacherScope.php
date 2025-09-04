@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 
-class PessoaScope implements Scope
+class TeacherScope implements Scope
 {
     public function apply(Builder $query, Model $model): void
     {
-        if (!request()->pessoaId) {
+        if (!request()->client_id) {
             return;
         }
 
-        $query->where('pessoa_id', request()->pessoaId);
+        $query->where('teacher_id', request()->teacher_id);
     }
 }

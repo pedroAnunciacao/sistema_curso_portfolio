@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Concerns\BelongsToPessoa;
+use App\Models\Concerns\BelongsToTeacher;
 
 class Course extends Model
 {
-    use HasFactory, SoftDeletes, BelongsToPessoa;
+    use HasFactory, SoftDeletes, BelongsToTeacher;
 
     protected $fillable = [
         'title',
         'description',
-        'pessoa_id',
+        'teacher_id',
     ];
 
 
@@ -23,13 +23,16 @@ class Course extends Model
         return $this->hasMany(Lesson::class);
     }
 
-    public function professor()
+    public function teacher()
     {
-        return $this->belongsTo(Pessoa::class, 'pessoa_id');
+        return $this->hasMany(Teacher::class);
     }
+
+
+
 
     public function students()
     {
-        return $this->belongsToMany(Pessoa::class, 'enrollments')->withTimestamps();
+        return $this->belongsToMany(Student::class, 'enrollments')->withTimestamps();
     }
 }

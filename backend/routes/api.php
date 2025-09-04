@@ -7,7 +7,7 @@ use App\Http\Controllers\LessonController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\PessoaController;
 use App\Http\Controllers\CheckoutController;
-
+use App\Http\Middleware\BindRequestFilter;
 
 
 // Auth
@@ -19,14 +19,16 @@ Route::post('checkout/postback', [CheckoutController::class, 'postback']);
 Route::middleware(
     [
         'auth:api',
-        \App\Http\Middleware\BindPessoaId::class,
-        \App\Http\Middleware\LoadClientConfig::class
+        BindRequestFilter::class,
     ]
 )->group(function () {
     Route::apiResource('courses', CourseController::class);
     Route::apiResource('pessoas', PessoaController::class);
     Route::apiResource('lessons', LessonController::class);
     Route::apiResource('enrollments', EnrollmentController::class);
+});
+
+Route::middleware(['auth:api', 'checkout'])->group(function () {
     Route::post('checkout/pix', [CheckoutController::class, 'pix']);
     Route::post('checkout/card', [CheckoutController::class, 'card']);
     Route::post('checkout/boleto', [CheckoutController::class, 'boleto']);

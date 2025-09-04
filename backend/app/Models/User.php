@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use App\Traits\HasRoleIds;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoleIds;
 
     protected $fillable = [
         'name',
@@ -37,5 +38,19 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Pessoa::class);
     }
-    
+
+    public function student()
+    {
+        return $this->pessoa?->student;
+    }
+
+    public function teacher()
+    {
+        return $this->pessoa?->teacher;
+    }
+
+    public function client()
+    {
+        return $this->pessoa?->client;
+    }
 }

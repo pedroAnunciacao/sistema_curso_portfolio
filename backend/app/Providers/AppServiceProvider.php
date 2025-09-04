@@ -16,25 +16,20 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(ExceptionHandler::class, AppHandler::class);
-            $this->app->scoped('client', function ($app) {
-        return new ClientService();
-    });
-
+        $this->app->scoped('client', function ($app) {
+            return new ClientService();
+        });
     }
 
     /**
      * Bootstrap any application services.
      */
-public function boot(): void
-{
+    public function boot(): void
+    {
 
-    Relation::morphMap([
-    'courses' => \App\Models\Course::class,
-]);
+        Relation::morphMap([
+            'courses' => \App\Models\Course::class,
+        ]);
 
-    if (auth()->check()) {
-        $client = $this->app->make('client');
-        $client->loadConfig(auth()->user()->pessoa_id ?? 6); // fallback
     }
-}
 }

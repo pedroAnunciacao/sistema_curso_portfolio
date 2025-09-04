@@ -2,50 +2,25 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Models\Client;
 
 class ClientService
 {
     protected array $config = [];
 
     /**
-     * Carrega a configuração do client a partir do ID da pessoa
+     * Carrega a configuração do client a partir de um client_id
      */
-    public function loadConfig(int $pessoaId): void
+    public function loadConfig(int $clientId): void
     {
-        // Busca a pessoa
-        $pessoa = DB::table('pessoas')->where('id', $pessoaId)->first();
+        $client = Client::find($clientId);
 
-        if (!$pessoa) {
+        if (!$client) {
             $this->config = [];
             return;
         }
 
-        // Se for client (ele mesmo é o client)
-        if ($pessoa->role === 'client') {
-            $this->config = json_decode($pessoa->data, true)['config'] ?? [];
-        }
-
-        // Se for teacher, pega client da relação
-        if ($pessoa->role === 'teacher') {
-            
-            $client = DB::table('pessoas')->where('id', $pessoa->pessoa_id)->first();
-            $this->config = $client ? (json_decode($client->data, true)['config'] ?? []) : [];
-        }
-
-        // Se for student, pega client do teacher
-        if ($pessoa->role === 'student') {
-
-            $teacher = DB::table('pessoas')->where('id', $pessoa->pessoa_id)->first();
-
-            if ($teacher && $teacher->pessoa_id) {
-                $client = DB::table('pessoas')->where('id', $teacher->pessoa_id)->first();
-
-                $this->config = $client ? (json_decode($client->data, true)['config'] ?? []) : [];
-
-            }
-        }
+        $this->config = json_decode($client->config, true) ?? [];
     }
 
     /**
@@ -60,6 +35,7 @@ class ClientService
         if (!$key) {
             return $this->config['payments']['integrations']['gateways'] ?? [];
         }
+
         return data_get($this->config, $key);
     }
 }

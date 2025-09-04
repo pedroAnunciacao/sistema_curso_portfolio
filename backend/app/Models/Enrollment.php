@@ -11,13 +11,13 @@ class Enrollment extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'pessoa_id',
+        'student_id',
         'course_id',
     ];
 
-    public function pessoa()
+    public function student()
     {
-        return $this->belongsTo(Pessoa::class);
+        return $this->belongsTo(Student::class);
     }
 
     public function course()

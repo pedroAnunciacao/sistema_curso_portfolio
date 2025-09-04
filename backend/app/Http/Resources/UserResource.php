@@ -14,7 +14,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'email' => $this->email,
             'ativado' => $this->deleted_at === null,
-            'pessoa' => new PessoaResource($this->whenLoaded('pessoa'))
+            'pessoa' => new PessoaResource($this->whenLoaded('pessoa')),
         ];
     }
 }

@@ -2,31 +2,44 @@
 
 namespace App\Payments;
 
+use App\Payments\Contracts\PaymentGatewayInterface;
+use Exception;
+
 class PaymentGatewayFactory
 {
-    static $targetNamespace = "App\\Payments\\";
-
-    public static function create()
+    /**
+     * Cria a instância do gateway de pagamento do cliente.
+     *
+     * @return PaymentGatewayInterface
+     * @throws Exception
+     */
+    public static function create(): PaymentGatewayInterface
     {
-        $className = self::getDomainClass();
-        $classPath = self::$targetNamespace . $className;
+        $className = self::resolveClassName();
 
-        if ($className !== false && class_exists($classPath)) {
-            try {
-                $classInstance = new $classPath();
-                return $classInstance;
-            } catch (\Exception $e) {
-                dd($e);
-                var_dump($e->getMessage());
-            }
+        if (!class_exists($className)) {
+            throw new Exception("Classe de gateway '{$className}' não encontrada.");
         }
-        throw new \Exception('Classe não encontrada para o cliente');
-        return;
+
+        $instance = new $className();
+
+        if (!$instance instanceof PaymentGatewayInterface) {
+            throw new Exception("Classe '{$className}' deve implementar PaymentGatewayInterface.");
+        }
+
+        return $instance;
     }
 
-    private static function getDomainClass()
+    /**
+     * Retorna o nome completo da classe do gateway ativo do cliente
+     *
+     * @return string
+     */
+    private static function resolveClassName(): string
     {
-        $adpter = app('client')->gateways('payments.integrations.useConfig.active');
-        return app('client')->gateways("payments.integrations.gateways.{$adpter}.class");
+        $activeGateway = app('client')->gateways('config.payments.integrations.useConfig.active');
+        $class = app('client')->gateways("config.payments.integrations.gateways.{$activeGateway}.class");
+
+        return "App\\Payments\\{$class}";
     }
 }
