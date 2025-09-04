@@ -12,13 +12,6 @@ class Pessoa extends Model
 {
     use HasFactory, SoftDeletes, BelongsToPessoa, VirtualColumn;
 
-    // protected $fillable = [
-    //     'nome',
-    //     'email',
-    //     'role'
-    // ];
-
-
     public function user()
     {
         return $this->hasOne(User::class);
@@ -42,7 +35,7 @@ class Pessoa extends Model
     }
 
 
-        public function client()
+    public function client()
     {
         return $this->belongsTo(Pessoa::class, 'pessoa_id')->where('role', 'client');
     }
@@ -54,12 +47,10 @@ class Pessoa extends Model
     }
     public function resolveConfig(): array
     {
-        // Se for teacher -> pega client direto
         if ($this->role === 'teacher' && $this->client) {
             return $this->client->config ?? [];
         }
 
-        // Se for student -> pega config do teacher->client
         if ($this->role === 'student' && $this->teacher && $this->teacher->client) {
             return $this->teacher->client->config ?? [];
         }
@@ -68,14 +59,12 @@ class Pessoa extends Model
     }
 
 
-        public static function getCustomColumns(): array
+    public static function getCustomColumns(): array
     {
         return [
-        'nome',
-        'email',
-        'role',
+            'nome',
+            'email',
+            'role',
         ];
     }
-
-
 }

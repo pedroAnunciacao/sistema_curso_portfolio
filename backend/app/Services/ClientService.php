@@ -16,7 +16,6 @@ class ClientService
     {
         // Busca a pessoa
         $pessoa = DB::table('pessoas')->where('id', $pessoaId)->first();
-        Log::info('#UpdateModelTransaction', [$pessoa]);
 
         if (!$pessoa) {
             $this->config = [];

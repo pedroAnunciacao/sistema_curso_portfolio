@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use App\Exceptions\Handler as AppHandler;
 use App\Services\ClientService;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,11 @@ class AppServiceProvider extends ServiceProvider
      */
 public function boot(): void
 {
+
+    Relation::morphMap([
+    'courses' => \App\Models\Course::class,
+]);
+
     if (auth()->check()) {
         $client = $this->app->make('client');
         $client->loadConfig(auth()->user()->pessoa_id ?? 6); // fallback

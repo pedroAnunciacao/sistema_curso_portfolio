@@ -13,7 +13,7 @@ use App\Http\Controllers\CheckoutController;
 // Auth
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::middleware('auth:api')->get('/me', [AuthController::class, 'me']);
-        Route::post('checkout/postback', [CheckoutController::class, 'postback']);
+Route::post('checkout/postback', [CheckoutController::class, 'postback']);
 
 // API Resources protegidos
 Route::middleware(
@@ -27,7 +27,8 @@ Route::middleware(
     Route::apiResource('pessoas', PessoaController::class);
     Route::apiResource('lessons', LessonController::class);
     Route::apiResource('enrollments', EnrollmentController::class);
-    Route::get('checkout/pix', [CheckoutController::class, 'createPix']);
-        Route::get('checkout/card', [CheckoutController::class, 'card']);
-
+    Route::post('checkout/pix', [CheckoutController::class, 'pix']);
+    Route::post('checkout/card', [CheckoutController::class, 'card']);
+    Route::post('checkout/boleto', [CheckoutController::class, 'boleto']);
+    Route::post('checkout/index', [CheckoutController::class, 'index']);
 });
