@@ -33,12 +33,12 @@ class EnrollmentController extends Controller
                     });
                 }),
                 AllowedFilter::callback('student', function (Builder $query, $value) {
-                    $query->whereHas('pessoa', function ($q) use ($value) {
+                    $query->whereHas('person', function ($q) use ($value) {
                         $q->where('nome', 'ilike', "%$value%");
                     });
                 }),
             ])
-            ->allowedIncludes(['pessoa', 'course'])
+            ->allowedIncludes(['person', 'course'])
             ->withTrashed()
             ->paginate($perPage);
 
@@ -49,7 +49,7 @@ class EnrollmentController extends Controller
     {
         $this->authorize('view', $enrollment);
 
-        return new EnrollmentResource($enrollment->load(['pessoa', 'course']));
+        return new EnrollmentResource($enrollment->load(['person', 'course']));
     }
 
     public function store(Request $request)

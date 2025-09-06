@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dd9fb1cdc79aa870fe16fbd1dec738b8",
+    "content-hash": "c7f12576e24ed4ca50162cef31f3eef4",
     "packages": [
         {
             "name": "brick/math",
@@ -3048,6 +3048,90 @@
                 }
             ],
             "time": "2025-05-08T08:14:37+00:00"
+        },
+        {
+            "name": "owen-it/laravel-auditing",
+            "version": "v14.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/owen-it/laravel-auditing.git",
+                "reference": "f92602d1b3f53df29ddd577290e9d735ea707c53"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/owen-it/laravel-auditing/zipball/f92602d1b3f53df29ddd577290e9d735ea707c53",
+                "reference": "f92602d1b3f53df29ddd577290e9d735ea707c53",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "illuminate/console": "^11.0|^12.0",
+                "illuminate/database": "^11.0|^12.0",
+                "illuminate/filesystem": "^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.5.1",
+                "orchestra/testbench": "^9.0|^10.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "package",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "OwenIt\\Auditing\\AuditingServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "v14-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "OwenIt\\Auditing\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Antério Vieira",
+                    "email": "anteriovieira@gmail.com"
+                },
+                {
+                    "name": "Raphael França",
+                    "email": "raphaelfrancabsb@gmail.com"
+                },
+                {
+                    "name": "Morten D. Hansen",
+                    "email": "morten@visia.dk"
+                }
+            ],
+            "description": "Audit changes of your Eloquent models in Laravel",
+            "homepage": "https://laravel-auditing.com",
+            "keywords": [
+                "Accountability",
+                "Audit",
+                "auditing",
+                "changes",
+                "eloquent",
+                "history",
+                "laravel",
+                "log",
+                "logging",
+                "lumen",
+                "observer",
+                "record",
+                "revision",
+                "tracking"
+            ],
+            "support": {
+                "issues": "https://github.com/owen-it/laravel-auditing/issues",
+                "source": "https://github.com/owen-it/laravel-auditing"
+            },
+            "time": "2025-02-26T16:40:54+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -9417,6 +9501,90 @@
                 }
             ],
             "time": "2024-10-09T05:16:32+00:00"
+        },
+        {
+            "name": "squizlabs/php_codesniffer",
+            "version": "3.13.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
+                "reference": "ad545ea9c1b7d270ce0fc9cbfb884161cd706119"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/ad545ea9c1b7d270ce0fc9cbfb884161cd706119",
+                "reference": "ad545ea9c1b7d270ce0fc9cbfb884161cd706119",
+                "shasum": ""
+            },
+            "require": {
+                "ext-simplexml": "*",
+                "ext-tokenizer": "*",
+                "ext-xmlwriter": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.3.4"
+            },
+            "bin": [
+                "bin/phpcbf",
+                "bin/phpcs"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Greg Sherwood",
+                    "role": "Former lead"
+                },
+                {
+                    "name": "Juliette Reinders Folmer",
+                    "role": "Current lead"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer/graphs/contributors"
+                }
+            ],
+            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
+            "homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
+            "keywords": [
+                "phpcs",
+                "standards",
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/PHPCSStandards/PHP_CodeSniffer/issues",
+                "security": "https://github.com/PHPCSStandards/PHP_CodeSniffer/security/policy",
+                "source": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
+                "wiki": "https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/PHPCSStandards",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/jrfnl",
+                    "type": "github"
+                },
+                {
+                    "url": "https://opencollective.com/php_codesniffer",
+                    "type": "open_collective"
+                },
+                {
+                    "url": "https://thanks.dev/u/gh/phpcsstandards",
+                    "type": "thanks_dev"
+                }
+            ],
+            "time": "2025-09-05T05:47:09+00:00"
         },
         {
             "name": "staabm/side-effects-detector",

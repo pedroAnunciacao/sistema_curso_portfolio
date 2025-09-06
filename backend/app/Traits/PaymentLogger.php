@@ -8,7 +8,7 @@ trait PaymentLogger
 {
     protected function logSuccess(string $method, array $data, string $startTime, string $endTime): void
     {
-        Log::channel(match(strtolower($method)) {
+        Log::channel(match (strtolower($method)) {
             'pix'    => 'checkout_pix',
             'card'   => 'checkout_card',
             'boleto' => 'checkout_boleto',
@@ -30,7 +30,7 @@ trait PaymentLogger
             'details'   => method_exists($e, 'getDetails') ? $e->getDetails() : null,
         ], $extra);
 
-        Log::channel(match(strtolower($method)) {
+        Log::channel(match (strtolower($method)) {
             'pix'    => 'checkout_pix',
             'card'   => 'checkout_card',
             'boleto' => 'checkout_boleto',

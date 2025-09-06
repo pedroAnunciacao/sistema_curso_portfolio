@@ -25,16 +25,21 @@ class AuthController extends Controller
         ]);
 
         $response = app()->handle($request);
-        $content = json_decode($response->getContent());
-        if (!$response->isOk()) {
-            return response()->json(['error' => $content->error], $response->getStatusCode());
+        $content = json_decode($response->getContent(), true); // decodifica como array
+
+        // Se houver erro no login, retorna error_description
+        if (isset($content['error'])) {
+            return response()->json([
+                'error' => $content['error_description'] ?? $content['error']
+            ], $response->getStatusCode());
         }
 
+        // Caso sucesso, retorna tokens
         return response()->json([
-            'tokenType' => $content->token_type,
-            'expiresIn' => $content->expires_in,
-            'accessToken' => $content->access_token,
-            'refreshToken' => $content->refresh_token,
+            'tokenType' => $content['token_type'],
+            'expiresIn' => $content['expires_in'],
+            'accessToken' => $content['access_token'],
+            'refreshToken' => $content['refresh_token'],
         ], $response->getStatusCode());
     }
 
@@ -43,7 +48,7 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        $user = $request->user()->loadMissing('pessoa');
+        $user = $request->user()->loadMissing('person');
 
         return new UserResource($user);
     }

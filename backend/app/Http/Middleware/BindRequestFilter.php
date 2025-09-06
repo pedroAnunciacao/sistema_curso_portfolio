@@ -11,8 +11,8 @@ class BindRequestFilter
     public function handle(Request $request, Closure $next)
     {
         if ($request->header('X-Content')) {
-            $user = User::with('pessoa')->find($request->header('X-Content'));
-            
+            $user = User::with('person')->find($request->header('X-Content'));
+
             if ($user) {
                 $request->merge($user->resolveRoleIds());
             }

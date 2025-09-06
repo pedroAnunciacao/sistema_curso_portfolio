@@ -10,6 +10,9 @@ class StudentResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'email_educacional' => $this->email_educacional,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

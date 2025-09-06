@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePessoaRequest;
 use App\Http\Resources\PessoaResource;
-use App\Models\Pessoa;
+use App\Models\Person;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -14,7 +14,7 @@ class PessoaController extends Controller
 {
     protected $repository;
 
-    public function __construct(Pessoa $repository)
+    public function __construct(Person $repository)
     {
         $this->repository = $repository;
     }
@@ -22,7 +22,7 @@ class PessoaController extends Controller
     public function index(Request $request)
     {
         // Exemplo de autorização (policies)
-        // $this->authorize('viewAny', Pessoa::class);
+        // $this->authorize('viewAny', Person::class);
 
         $perPage = (int) $request->get('page_size') ?? 10;
 
@@ -50,34 +50,34 @@ class PessoaController extends Controller
         return PessoaResource::collection($courses);
     }
 
-    public function show(Pessoa $pessoa)
+    public function show(Person $person)
     {
-        // $this->authorize('view', $pessoa);
+        // $this->authorize('view', $person);
 
-        return new PessoaResource($pessoa->load(['professor', 'lessons', 'students']));
+        return new PessoaResource($person->load(['professor', 'lessons', 'students']));
     }
 
     public function store(StorePessoaRequest $request)
     {
-        $pessoa = $this->repository->create($request->pessoa);
+        $person = $this->repository->create($request->person);
 
-        return new PessoaResource($pessoa);
+        return new PessoaResource($person);
     }
 
-    public function update(StorePessoaRequest $request, Pessoa $pessoa)
+    public function update(StorePessoaRequest $request, Person $person)
     {
-        // $this->authorize('update', $pessoa);
+        // $this->authorize('update', $person);
 
-        $pessoa->update($request->pessoa);
+        $person->update($request->person);
 
-        return new PessoaResource($pessoa);
+        return new PessoaResource($person);
     }
 
-    public function destroy(Pessoa $pessoa)
+    public function destroy(Person $person)
     {
-        // $this->authorize('delete', $pessoa);
+        // $this->authorize('delete', $person);
 
-        $pessoa->delete();
+        $person->delete();
 
         return response()->noContent();
     }

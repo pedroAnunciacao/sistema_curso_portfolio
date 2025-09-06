@@ -10,14 +10,14 @@ return new class extends Migration {
         Schema::create('teachers', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->unsignedBigInteger('pessoa_id');
-            $table->foreign('pessoa_id')
+            $table->unsignedBigInteger('person_id');
+            $table->foreign('person_id')
                 ->references('id')
-                ->on('pessoas')
+                ->on('people')
                 ->onDelete('cascade');
 
-            $table->unsignedBigInteger('cliente_id');
-            $table->foreign('cliente_id')
+            $table->unsignedBigInteger('client_id');
+            $table->foreign('client_id')
                 ->references('id')
                 ->on('clients')
                 ->onDelete('cascade');

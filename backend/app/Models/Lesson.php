@@ -6,15 +6,26 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Lesson extends Model
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableInterface;
+
+
+class Lesson extends Model implements AuditableInterface
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Auditable;
 
     protected $fillable = [
         'title',
         'content',
         'course_id',
     ];
+
+    public function transformAudit(array $data): array
+    {
+        $data['client_id'] = request()->client_id;
+        return $data;
+    }
+
 
     public function course()
     {

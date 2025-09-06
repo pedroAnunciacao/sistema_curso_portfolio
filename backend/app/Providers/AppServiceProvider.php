@@ -29,7 +29,8 @@ class AppServiceProvider extends ServiceProvider
 
         Relation::morphMap([
             'courses' => \App\Models\Course::class,
-        ]);
+            'checkouts' => \App\Models\Checkout::class,
 
+        ]);
     }
 }

@@ -2,23 +2,25 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+
 use Laravel\Passport\HasApiTokens;
+use OwenIt\Auditing\Auditable;  
+use OwenIt\Auditing\Contracts\Auditable as AuditableInterface;
+
 use App\Traits\HasRoleIds;
 
-class User extends Authenticatable
+class User extends Authenticatable implements AuditableInterface
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, HasRoleIds;
+    use HasApiTokens, HasFactory, Notifiable, HasRoleIds, Auditable;
 
     protected $fillable = [
         'name',
         'email',
         'password',
-        'pessoa_id'
+        'person_id'
     ];
 
     protected $hidden = [
@@ -34,23 +36,29 @@ class User extends Authenticatable
         ];
     }
 
-    public function pessoa()
+    public function transformAudit(array $data): array
     {
-        return $this->belongsTo(Pessoa::class);
+        $data['client_id'] = request()->client_id;
+        return $data;
+    }
+
+    public function person()
+    {
+        return $this->belongsTo(Person::class);
     }
 
     public function student()
     {
-        return $this->pessoa?->student;
+        return $this->person?->student;
     }
 
     public function teacher()
     {
-        return $this->pessoa?->teacher;
+        return $this->person?->teacher;
     }
 
     public function client()
     {
-        return $this->pessoa?->client;
+        return $this->person?->client;
     }
 }

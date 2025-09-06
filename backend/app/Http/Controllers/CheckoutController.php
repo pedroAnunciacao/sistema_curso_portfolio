@@ -10,9 +10,9 @@ use App\Http\Requests\CheckoutCardRequest;
 use App\Http\Requests\CheckoutBoletoRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
-use App\Models\Checkout;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Request;
-
+use Illuminate\Http\JsonResponse;
 
 class CheckoutController extends Controller
 {
@@ -23,16 +23,13 @@ class CheckoutController extends Controller
         $this->service = $service;
     }
 
-
-        public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
 
         return $this->service->index($request);
     }
 
-
-
-    public function pix(CheckoutPixRequest $request)
+    public function pix(CheckoutPixRequest $request): JsonResponse
     {
         try {
             $data = $this->service->createPix($request->checkoutPix);
@@ -42,7 +39,7 @@ class CheckoutController extends Controller
         }
     }
 
-    public function card(CheckoutCardRequest $request)
+    public function card(CheckoutCardRequest $request): JsonResponse
     {
         try {
             $data = $this->service->createCard($request->checkoutCard);
@@ -52,7 +49,7 @@ class CheckoutController extends Controller
         }
     }
 
-    public function boleto(CheckoutBoletoRequest $request)
+    public function boleto(CheckoutBoletoRequest $request): JsonResponse
     {
         try {
             $data = $this->service->createBoleto($request->checkoutBoleto);
@@ -62,7 +59,7 @@ class CheckoutController extends Controller
         }
     }
 
-    private function handleException(\Exception $e, string $methodName, array $extra = [])
+    private function handleException(\Exception $e, string $methodName, array $extra = []): JsonResponse
     {
         Log::error("#Checkout{$methodName}", [
             'exception' => get_class($e),

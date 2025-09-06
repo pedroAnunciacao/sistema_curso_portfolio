@@ -27,7 +27,7 @@ class CheckoutResource extends JsonResource
 
     protected function getPolymorphicResource($model)
     {
-        // Pega o nome da classe sem namespace
+        // Pega o name da classe sem namespace
         $className = (new \ReflectionClass($model))->getShortName();
 
         // Converte para PascalCase singular (por convenção)

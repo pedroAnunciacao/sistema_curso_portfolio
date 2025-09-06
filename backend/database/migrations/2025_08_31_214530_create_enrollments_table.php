@@ -10,14 +10,14 @@ return new class extends Migration
     {
         Schema::create('enrollments', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->autoIncrement();
-            $table->unsignedBigInteger('pessoa_id'); // aluno
+            $table->unsignedBigInteger('person_id'); // aluno
             $table->unsignedBigInteger('course_id');
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('pessoa_id')
+            $table->foreign('person_id')
                 ->references('id')
-                ->on('pessoas')
+                ->on('people')
                 ->onDelete('cascade');
 
             $table->foreign('course_id')
@@ -30,7 +30,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('enrollments', function (Blueprint $table) {
-            $table->dropForeign(['pessoa_id']);
+            $table->dropForeign(['person_id']);
             $table->dropForeign(['course_id']);
         });
         Schema::dropIfExists('enrollments');

@@ -6,6 +6,9 @@ use App\Traits\PaymentLogger;
 use App\Payments\PaymentGatewayFactory;
 use App\Repositories\CheckoutRepository;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use App\Models\Checkout;
 
 class CheckoutService
 {
@@ -22,13 +25,13 @@ class CheckoutService
         $this->repository = $repository;
     }
 
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         return $this->repository->index($request);
     }
 
 
-    public function createPix(array $payload)
+    public function createPix(array $payload): Checkout
     {
         $startTime = now()->toDateTimeString();
 
@@ -53,7 +56,7 @@ class CheckoutService
         }
     }
 
-    public function createCard(array $payload)
+    public function createCard(array $payload): Checkout
     {
         $startTime = now()->toDateTimeString();
 
@@ -78,7 +81,7 @@ class CheckoutService
         }
     }
 
-    public function createBoleto(array $payload)
+    public function createBoleto(array $payload): Checkout
     {
         $startTime = now()->toDateTimeString();
 

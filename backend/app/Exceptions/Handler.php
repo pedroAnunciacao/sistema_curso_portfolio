@@ -25,7 +25,6 @@ class Handler extends ExceptionHandler
     {
         // Sempre responde JSON em rotas de API
         if ($request->is('api/*')) {
-
             if ($e instanceof ValidationException) {
                 return response()->json([
                     'success' => false,

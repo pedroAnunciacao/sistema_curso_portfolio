@@ -5,19 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Concerns\BelongsToPessoa;
-use Stancl\VirtualColumn\VirtualColumn;
+
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableInterface;
 
 class Teacher extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
-    protected $fillable = ['pessoa_id', 'client_id'];
+    protected $fillable = ['person_id', 'client_id'];
 
-    public function pessoa()
+    public function person()
     {
-        return $this->belongsTo(Pessoa::class);
+        return $this->belongsTo(Person::class);
     }
+
+    public function transformAudit(array $data): array
+    {
+        $data['client_id'] = request()->client_id;
+        return $data;
+    }
+
 
     public function courses()
     {

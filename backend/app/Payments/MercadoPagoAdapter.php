@@ -19,7 +19,7 @@ class MercadoPagoAdapter implements PaymentGatewayInterface
 
     public function __construct()
     {
-        $access_token = app('client')->gateways('config.payments.integrations.gateways.mercado_pago.access_token');
+        $access_token = app('client')->gateways('config.payments.integrations.gateways.mercado_pago.secret_key');
         MercadoPagoConfig::setAccessToken($access_token);
         $this->client = new PaymentClient();
     }

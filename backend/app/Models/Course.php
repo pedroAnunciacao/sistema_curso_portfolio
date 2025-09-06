@@ -5,11 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableInterface;
+
 use App\Models\Concerns\BelongsToTeacher;
 
-class Course extends Model
+class Course extends Model implements AuditableInterface
 {
-    use HasFactory, SoftDeletes, BelongsToTeacher;
+    use HasFactory, SoftDeletes, BelongsToTeacher, Auditable, HasFactory;
 
     protected $fillable = [
         'title',
@@ -17,6 +21,11 @@ class Course extends Model
         'teacher_id',
     ];
 
+    public function transformAudit(array $data): array
+    {
+        $data['client_id'] = request()->client_id;
+        return $data;
+    }
 
     public function lessons()
     {
@@ -25,11 +34,8 @@ class Course extends Model
 
     public function teacher()
     {
-        return $this->hasMany(Teacher::class);
+        return $this->belongsTo(Teacher::class, 'teacher_id');
     }
-
-
-
 
     public function students()
     {

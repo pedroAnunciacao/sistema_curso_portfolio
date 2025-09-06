@@ -12,18 +12,18 @@ trait HasRoleIds
             'student_id' => null,
         ];
 
-        if ($this->pessoa?->client) {
-            $ids['client_id'] = $this->pessoa->client->id;
+        if ($this->person?->client) {
+            $ids['client_id'] = $this->person->client->id;
         }
 
-        if ($this->pessoa?->teacher) {
-            $ids['teacher_id'] = $this->pessoa->teacher->id;
-            $ids['client_id']  = $this->pessoa->teacher->cliente_id;
+        if ($this->person?->teacher) {
+            $ids['teacher_id'] = $this->person->teacher->id;
+            $ids['client_id']  = $this->person->teacher->client_id;
         }
 
-        if ($this->pessoa?->student) {
-            $ids['student_id'] = $this->pessoa->student->id;
-            $ids['client_id']  = $this->pessoa->student->cliente_id;
+        if ($this->person?->student) {
+            $ids['student_id'] = $this->person->student->id;
+            $ids['client_id']  = $this->person->student->client_id;
         }
 
         return $ids;

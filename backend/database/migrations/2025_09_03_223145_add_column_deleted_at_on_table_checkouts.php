@@ -6,19 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        //
+        Schema::table('checkouts', function (Blueprint $table) {
+            $table->softDeletes();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        //
     }
 };

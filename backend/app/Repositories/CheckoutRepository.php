@@ -7,6 +7,8 @@ use App\Models\Checkout;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Http\Response;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CheckoutRepository
 {
@@ -17,7 +19,7 @@ class CheckoutRepository
         $this->model = $model;
     }
 
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         $perPage = (int) $request->get('page_size') ?? 10;
 

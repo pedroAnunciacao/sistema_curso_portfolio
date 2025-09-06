@@ -12,13 +12,13 @@ return new class extends Migration
             $table->unsignedBigInteger('id')->autoIncrement();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->unsignedBigInteger('pessoa_id');
+            $table->unsignedBigInteger('person_id');
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('pessoa_id')
+            $table->foreign('person_id')
                 ->references('id')
-                ->on('pessoas')
+                ->on('people')
                 ->onDelete('cascade');
         });
     }
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('courses', function (Blueprint $table) {
-            $table->dropForeign(['pessoa_id']);
+            $table->dropForeign(['person_id']);
         });
         Schema::dropIfExists('courses');
     }

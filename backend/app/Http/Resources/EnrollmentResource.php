@@ -10,7 +10,7 @@ class EnrollmentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'pessoa' => new PessoaResource($this->whenLoaded('pessoa')),
+            'person' => new PessoaResource($this->whenLoaded('person')),
             'course' => new CourseResource($this->whenLoaded('course')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

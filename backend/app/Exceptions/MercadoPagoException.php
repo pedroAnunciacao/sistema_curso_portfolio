@@ -57,7 +57,7 @@ class MercadoPagoException extends Exception
 
     protected function logException(): void
     {
-        $channel = match(strtolower($this->methodName)) {
+        $channel = match (strtolower($this->methodName)) {
             'pix' => 'checkout_pix',
             'card' => 'checkout_card',
             'boleto' => 'checkout_boleto',

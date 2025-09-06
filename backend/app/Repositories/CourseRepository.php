@@ -10,7 +10,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
 
-class CourseRepository 
+class CourseRepository
 {
     protected $model;
 
@@ -28,20 +28,20 @@ class CourseRepository
             ->defaultSort('-id')
             ->allowedFilters([
                 AllowedFilter::partial('title'),
-                AllowedFilter::callback('professor.nome', function (Builder $query, $value) {
-                    $query->whereHas('professor', function ($q) use ($value) {
+                AllowedFilter::callback('teacher.nome', function (Builder $query, $value) {
+                    $query->whereHas('teacher', function ($q) use ($value) {
                         $q->where('nome', 'like', "%{$value}%");
                     });
                 }),
-                AllowedFilter::callback('professor.email', function (Builder $query, $value) {
-                    $query->whereHas('professor', function ($q) use ($value) {
+                AllowedFilter::callback('teacher.email', function (Builder $query, $value) {
+                    $query->whereHas('teacher', function ($q) use ($value) {
                         $q->where('email', $value);
                     });
                 }),
 
 
             ])
-            ->allowedIncludes(['professor', 'lessons', 'students'])
+            ->allowedIncludes(['teacher.person', 'lessons', 'students'])
             ->withTrashed()
             ->paginate($perPage);
 
@@ -51,7 +51,7 @@ class CourseRepository
     public function show(Course $course)
     {
 
-        return new CourseResource($course->load(['professor', 'lessons', 'students']));
+        return new CourseResource($course->load(['teacher.person', 'lessons', 'students']));
     }
 
     public function store(array $courseFormData)
