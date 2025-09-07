@@ -13,17 +13,20 @@ class Person extends Model implements AuditableInterface
 {
     use HasFactory, SoftDeletes, Auditable;
 
+        protected $fillable = ['name', 'email', 'birth_date', 'cpf_cnpj'];
+
+
     public function user()
     {
         return $this->hasOne(User::class);
     }
 
-    public function address()
+    public function addresses()
     {
-        return $this->hasMany(Address::class);
+        return $this->hasOne(Address::class)->where('is_default', true);
     }
 
-    public function contact()
+    public function contacts()
     {
         return $this->hasMany(Contact::class);
     }

@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\EstadoResource;
-use App\Models\Estado;
+use App\Http\Resources\StateResource;
+use App\Models\State;
 
 class EstadoController extends Controller
 {
     protected $repository;
 
-    public function __construct(Estado $repository)
+    public function __construct(State $repository)
     {
         $this->repository = $repository;
     }
 
     public function index()
     {
-        return EstadoResource::collection($this->repository->all());
+        return StateResource::collection($this->repository->all());
     }
 }

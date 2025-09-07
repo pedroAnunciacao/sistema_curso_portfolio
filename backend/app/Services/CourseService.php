@@ -10,8 +10,6 @@ use App\Http\Requests\UpdateCourseRequest;
 
 class CourseService
 {
-    protected $adapter;
-    protected $exceptionClass;
     protected $repository;
 
     public function __construct(CourseRepository $repository)

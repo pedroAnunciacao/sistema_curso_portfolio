@@ -6,16 +6,17 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CidadeResource extends JsonResource
+class StateResource extends JsonResource
 {
     public function toArray($request)
     {
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'codigo' => $this->when($this->codigo, $this->codigo),
-            'estadoId' => $this->when($this->estado_id, $this->estado_id),
-            'estado' => new EstadoResource($this->whenLoaded('estado')),
+            'code' => $this->code,
+            'abbreviation' => $this->abbreviation,
+            'area_codes' => $this->area_codes,
+            'city' => CityResource::collection($this->whenLoaded('city')),
         ];
     }
 }

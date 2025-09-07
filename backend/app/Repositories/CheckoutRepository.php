@@ -23,7 +23,7 @@ class CheckoutRepository
     {
         $perPage = (int) $request->get('page_size') ?? 10;
 
-        $courses = QueryBuilder::for($this->model->query())
+        $checkout = QueryBuilder::for($this->model->query())
             ->defaultSort('-id')
             ->allowedFilters([
                 AllowedFilter::exact('transaction_id'),
@@ -33,8 +33,7 @@ class CheckoutRepository
             ->allowedIncludes(['model'])
             ->withTrashed()
             ->paginate($perPage);
-
-        return CheckoutResource::collection($courses);
+        return CheckoutResource::collection($checkout);
     }
 
     public function create(array $data): Checkout

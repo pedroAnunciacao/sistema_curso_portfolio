@@ -5,7 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\EnrollmentController;
-use App\Http\Controllers\PessoaController;
+use App\Http\Controllers\PersonController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Middleware\BindRequestFilter;
 
@@ -22,7 +22,7 @@ Route::middleware(
     ]
 )->group(function () {
     Route::apiResource('courses', CourseController::class);
-    Route::apiResource('people', PessoaController::class);
+    Route::apiResource('people', PersonController::class);
     Route::apiResource('lessons', LessonController::class);
     Route::apiResource('enrollments', EnrollmentController::class);
 });

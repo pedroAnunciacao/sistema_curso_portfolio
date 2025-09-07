@@ -9,10 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Models\Checkout;
+use App\Traits\ResolvesTransactionId;
 
 class CheckoutService
 {
-    use PaymentLogger;
+    use PaymentLogger, ResolvesTransactionId;
 
     protected $adapter;
     protected $exceptionClass;
@@ -38,7 +39,7 @@ class CheckoutService
         try {
             $pix = $this->adapter->createPix($payload);
             $checkout = $this->repository->create([
-                'transaction_id' => $pix['id'],
+            'transaction_id' => $this->resolveTransactionId($pix),
                 'method' => 'pix',
                 'status' => $pix['status'],
                 'model_type' => $payload['model_type'] ?? null,
@@ -63,7 +64,7 @@ class CheckoutService
         try {
             $card = $this->adapter->createCard($payload);
             $checkout = $this->repository->create([
-                'transaction_id' => $card['id'],
+            'transaction_id' => $this->resolveTransactionId($card),
                 'method' => 'card',
                 'status' => $card['status'],
                 'model_type' => $payload['model_type'] ?? null,
@@ -88,7 +89,7 @@ class CheckoutService
         try {
             $boleto = $this->adapter->createBoleto($payload);
             $checkout = $this->repository->create([
-                'transaction_id' => $boleto['id'],
+            'transaction_id' => $this->resolveTransactionId($boleto),
                 'method' => 'boleto',
                 'status' => $boleto['status'],
                 'model_type' => $payload['model_type'] ?? null,

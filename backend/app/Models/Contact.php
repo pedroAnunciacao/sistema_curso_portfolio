@@ -19,7 +19,7 @@ class Contact extends Model implements AuditableInterface
 
     protected $with = ['type'];
 
-    protected $fillable = ['content', 'contato_tcontatc_type_idipo_id'];
+    protected $fillable = ['content', 'contact_type_id'];
 
     public function transformAudit(array $data): array
     {
@@ -34,6 +34,6 @@ class Contact extends Model implements AuditableInterface
 
     public function type()
     {
-        return $this->belongsTo(ContactType::class, 'contatc_type_id');
+        return $this->belongsTo(ContactType::class, 'contact_type_id');
     }
 }

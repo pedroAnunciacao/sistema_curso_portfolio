@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\CidadeResource;
-use App\Models\Cidade;
+use App\Http\Resources\CityResource;
+use App\Models\City;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -13,19 +13,19 @@ class CidadeController extends Controller
 {
     protected $repository;
 
-    public function __construct(Cidade $repository)
+    public function __construct(City $repository)
     {
         $this->repository = $repository;
     }
 
     public function index()
     {
-        $cidades = QueryBuilder::for(Cidade::class)
+        $cidades = QueryBuilder::for(City::class)
             ->allowedFields('id', 'nome')
             ->allowedFilters(AllowedFilter::exact('codigo'), AllowedFilter::exact('estado_id'))
             ->get();
 
-        return CidadeResource::collection($cidades);
+        return CityResource::collection($cidades);
     }
 
     public function show(int $id)
@@ -35,6 +35,6 @@ class CidadeController extends Controller
             ->whereKey($id)
             ->firstOrFail();
 
-        return new CidadeResource($cidade);
+        return new CityResource($cidade);
     }
 }

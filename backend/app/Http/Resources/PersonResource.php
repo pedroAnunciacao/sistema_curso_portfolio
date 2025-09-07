@@ -16,6 +16,8 @@ class PersonResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'client' => new PersonResource($this->whenLoaded('client')),
+            'Addresses' => new AddressesResource($this->whenLoaded('addresses')),
+
         ];
     }
 }

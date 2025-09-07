@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('states', function (Blueprint $table): void {
+
+        Schema::create('contacts_types', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('code')->unique();  // codigo
-            $table->string('name', 100);                // nome
-            $table->string('abbreviation', 2);         // uf
-            $table->json('area_codes');                 // ddd
+            $table->string('name');
+            $table->timestamps();
         });
+
     }
 
     /**
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('states');
+        Schema::dropIfExists('contacts_types');
     }
 };

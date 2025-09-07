@@ -12,11 +12,7 @@ use Stancl\VirtualColumn\VirtualColumn;
 
 class Client extends Model implements AuditableInterface
 {
-    use HasFactory;
-    use SoftDeletes;
-    use Auditable;
-    use HasFactory;
-    use VirtualColumn;
+    use HasFactory, SoftDeletes, Auditable, HasFactory, VirtualColumn;
 
     protected $fillable = ['person_id', 'config'];
 

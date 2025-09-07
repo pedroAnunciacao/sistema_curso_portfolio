@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableInterface;
+use App\Models\Concerns\BelongsToTeacher;
+use App\Models\Concerns\BelongsToClient;
+use App\Models\Concerns\BelongsToStudent;
 
 class Checkout extends Model implements AuditableInterface
 {
-    use SoftDeletes, Auditable, HasFactory;
+    use SoftDeletes, Auditable, HasFactory, BelongsToClient, BelongsToTeacher, BelongsToStudent;
 
     protected $fillable = [
         'transaction_id',
