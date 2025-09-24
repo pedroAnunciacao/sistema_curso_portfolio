@@ -41,7 +41,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
@@ -59,6 +59,13 @@ return [
             'throw' => false,
             'report' => false,
         ],
+
+        'imgbb' => [
+            'driver' => 'imgbb',
+            'api_key' => env('IMGBB_API_KEY'),
+            'api_url' => env('IMGBB_API_URL', 'https://api.imgbb.com/1/upload'),
+        ],
+
 
     ],
 

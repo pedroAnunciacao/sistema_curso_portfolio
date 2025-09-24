@@ -2,16 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCourseRequest;
-use App\Http\Requests\UpdateCourseRequest;
-use App\Http\Resources\CourseResource;
-use App\Models\Course;
 use Illuminate\Http\Request;
 use App\Services\CourseService;
+use App\Http\Requests\Course;
 
 class CourseController extends Controller
 {
-    protected $service;
+    protected CourseService $service;
 
     public function __construct(CourseService $service)
     {
@@ -21,29 +18,36 @@ class CourseController extends Controller
     public function index(Request $request)
     {
 
-        return $this->service->index($request);
+        $queryParams = $request->query('queryParams') ?? [];
+        return $this->service->index($queryParams);
     }
 
-    public function show(Course $course)
+    public function show(int|string $courseId)
     {
-
-        return $this->service->show($course);
+        return $this->service->show($courseId);
     }
 
-    public function store(StoreCourseRequest $request)
+    public function store(Request $request)
     {
-        return  $this->service->store($request);
+        return $this->service->store($request->course);
     }
 
-    public function update(UpdateCourseRequest $request, Course $course)
-    {
 
-        return  $this->service->update($request->course, $course);
+    public function byTeacher(Request $request)
+    {
+        $queryParams = $request->query('queryParams') ?? [];
+
+        return $this->service->byTeacher($queryParams);
     }
 
-    public function destroy(Course $course)
-    {
 
-        return  $this->service->destroy($course);
+    public function update(Request $request)
+    {
+        return $this->service->update($request->course);
+    }
+
+    public function destroy(int|string $courseId)
+    {
+        return $this->service->destroy($courseId);
     }
 }

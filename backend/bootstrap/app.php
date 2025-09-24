@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\BindRequestFilter;
 use App\Http\Middleware\LoadClientConfig;
+use App\Http\Middleware\FormatJsonResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,9 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Middleware global (se tiver)
-        
-        // Registrar grupo de middleware 'checkout'
+         $middleware->append(FormatJsonResponse::class);
         $middleware->appendToGroup('checkout', [
             BindRequestFilter::class,
             LoadClientConfig::class,

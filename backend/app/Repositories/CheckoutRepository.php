@@ -27,10 +27,12 @@ class CheckoutRepository
             ->defaultSort('-id')
             ->allowedFilters([
                 AllowedFilter::exact('transaction_id'),
+                AllowedFilter::exact('model_id'),
+                AllowedFilter::exact('model_type'),
                 AllowedFilter::exact('method'),
                 AllowedFilter::exact('status'),
             ])
-            ->allowedIncludes(['model'])
+            ->allowedIncludes(['model','teacher', 'student'])
             ->withTrashed()
             ->paginate($perPage);
         return CheckoutResource::collection($checkout);

@@ -4,151 +4,234 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Http\Requests\StorePersonRequest;
+use App\Repositories\Contracts\PersonRepositoryInterface;
+use App\Enums\TypePersons;
 use App\Http\Resources\PersonResource;
 use App\Models\Person;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
+use App\Repositories\Filters\FilterResolver;
+use App\Repositories\Filters\LikeNameFilter;
 
-class PersonRepository
+
+class PersonRepository implements PersonRepositoryInterface
 {
+    /**
+     * @var \Closure
+     */
+    protected $clientRepositoryFactory;
+    /**
+     * @var \Closure
+     */
+    protected $teacherRepositoryFactory;
+
+    /**
+     * @var \Closure
+     */
+    protected $studentRepositoryFactor;
+
+    /**
+     * @var \Closure
+     */
+    protected $contactRepositoryFactory;
+    /**
+     * @var \Closure
+     */
+    protected $addressRepositoryFactory;
+    /**
+     * @var \Closure
+     */
+    protected $userRepositoryFactory;
+
+
+    /**
+     * @var \Person
+     */
     private $model;
 
-    public function __construct(Person $model)
-    {
+    public function __construct(
+        \Closure $clientRepositoryFactory,
+        \Closure $teacherRepositoryFactory,
+        \Closure $studentRepositoryFactor,
+        \Closure $userRepositoryFactory,
+        \Closure $addressRepositoryFactory,
+        \Closure $contactRepositoryFactory,
+        Person $model,
+
+    ) {
         $this->model = $model;
+        $this->clientRepositoryFactory = $clientRepositoryFactory;
+        $this->teacherRepositoryFactory = $teacherRepositoryFactory;
+        $this->studentRepositoryFactor = $studentRepositoryFactor;
+        $this->addressRepositoryFactory = $addressRepositoryFactory;
+        $this->contactRepositoryFactory = $contactRepositoryFactory;
+        $this->userRepositoryFactory = $userRepositoryFactory;
+
     }
 
-    public function index(Request $request)
+    protected function addressRepository(): AddressRepository
     {
-
-        $perPage = (int) $request->get('page_size') ?? 10;
-
-        $person = QueryBuilder::for($this->model::class)
-            ->defaultSort('-id')
-            ->allowedFields('nome')
-            ->allowedFilters([
-                'nome',
-                AllowedFilter::exact('pessoa_tipo_id'),
-                AllowedFilter::callback(
-                    'cpf_cnpj',
-                    function (Builder $query, $value): void {
-                        $query->whereRaw('cpf_cnpj::varchar ilike ?', ["%$value%"]);
-                    }
-                ),
-                AllowedFilter::callback(
-                    'c_p_f/_c_n_p_j',
-                    function (Builder $query, $value): void {
-                        $cpfCnpj = preg_replace('/\D/', '', $value);
-                        $query->whereRaw('cpf_cnpj::varchar ilike ?', ["%$cpfCnpj%"]);
-                    }
-                ),
-                AllowedFilter::callback('search', function (Builder $query, $value): void {
-                    $query->where('nome', 'ilike', "%$value%")
-                        ->orWhere('nome_social', 'ilike', "%$value%")
-                        ->orWhere('cpf_cnpj', 'like', "%$value%");
-                }),
-            ])
-            ->allowedSorts(['nome'])
-            ->allowedIncludes([
-                'addresses.city.state',
-            ])
-            ->withTrashed()
-            ->paginate($perPage);
-
-        return PersonResource::collection($person);
+        return call_user_func($this->addressRepositoryFactory);
     }
 
-    public function show(int $id)
+    protected function contactRepository(): ContactRepository
     {
-        $pessoa = QueryBuilder::for($this->model::class)
-            ->allowedIncludes([
-                'documentos.file',
-                'documentos.cidade',
-                'documentos.estado',
-                'enderecos.cidade.estado',
-                'contatos',
-                'estadoCivil',
-                'sexo',
-                'genero',
-                'necessidadesEspeciais',
-                'filiacao.parentesco',
-                'cor',
-                'nacionalidade',
-                'alunos',
-                'professores',
-                'file',
-                'externalReferences',
-            ])
-            ->where('id', $id)
-            ->withTrashed()
-            ->firstOrFail();
-
-
-        return new PersonResource($pessoa);
+        return call_user_func($this->contactRepositoryFactory);
     }
 
-    public function store(StorePersonRequest $request)
+    protected function userRepository(): UserRepository
     {
-        $data = $request->input('person');
+        return call_user_func($this->userRepositoryFactory);
+    }
+    protected function clientRepository(): ClientRepository
+    {
+        return call_user_func($this->clientRepositoryFactory);
+    }
+
+    protected function teacherRepository(): TeacherRepository
+    {
+        return call_user_func($this->teacherRepositoryFactory);
+    }
+    protected function studentRepository(): StudentRepository
+    {
+        return call_user_func($this->studentRepositoryFactor);
+    }
+
+    public function index(array $queryParams)
+    {
+
+        $perPage = (int) isset($queryParams['page_size']) ?? 10;
+
+        $filters = [
+            'name' => LikeNameFilter::class,
+        ];
+
+        $query = $this->model::query();
+
+        $query = FilterResolver::applyFilters($query, $filters, $queryParams);
+
+        $persons = $query->with(['client', 'teacher', 'student'])->paginate();
+
+        return $persons;
+    }
+
+    public function show(int|string $personId)
+    {
+        $person = $this->model::findOrFail($personId);
+        return $person;
+    }
+
+    public function store(array $data)
+    {
 
         $person = DB::transaction(function () use ($data) {
             $resource = $this->model->create($data);
+            $dataPersonType = null;
+            switch ($data['type']) {
+                case TypePersons::CLIENT;
+                    $dataPersonType = [
+                        'person_id' => $resource->id,
+                        'config' => json_encode($data['client'][0]['config'][0])
+                    ];
 
-            collect(['addresses', 'contacts'])->each(function ($relationship) use ($data, $resource) {
-                $items = $data[$relationship] ?? [];
-                $resource->{$relationship}()->createMany($items);
-            });
+                    $this->clientRepository()->store($dataPersonType);
+
+                    break;
+
+                case TypePersons::TEACHER;
+
+                    $this->teacherRepository()->store(['person_id' => $resource->id]);
+                    break;
+                case TypePersons::STUDENT;
+
+                    $dataPersonType = [
+                        'person_id' => $resource->id,
+                        'email_educacional' => $data['email_educacional']
+                    ];
+                    $this->studentRepository()->store($dataPersonType);
+                    break;
+            }
+
+            $data['user'][0]['person_id'] = $resource->id;
+            $this->userRepository()->store($data['user'][0]);
+
+            if (!empty($data['addresses'])) {
+                $this->addressRepository()->createMany($resource->id, $data['addresses']);
+                $resource->load('addresses.city.state');
+            }
+
+            if (!empty($data['contacts'])) {
+                $this->contactRepository()->createMany($resource->id, $data['contacts']);
+            }
 
             return $resource;
         });
 
-        return new PersonResource($person);
+        match ($data['type']) {
+            'client' => $person->load('client'),
+            'teacher' => $person->load('teacher'),
+            'student' => $person->load('student'),
+            default => null
+        };
+
+        return $person;
     }
 
-    public function update(StorePersonRequest $request, int $id)
+    public function update(array $data)
     {
-        $person = $this->model::with(['addresses', 'contacts'])->findOrFail($id);
-        $data = $request->input('person');
+        $person = $this->model::with(['addresses', 'contacts', 'user'])->findOrFail($data['id']);
 
         DB::transaction(function () use ($person, $data) {
-            collect(['addresses', 'contacts'])->each(function ($relationship) use ($data, $person) {
-                $items = $data[$relationship] ?? [];
-                $keepIds = Arr::pluck(Arr::where($items, fn($item) => Arr::exists($item, 'id')), 'id');
+            switch ($data['type']) {
+                case TypePersons::CLIENT;
 
-                $person->{$relationship}()->whereNotIn('id', $keepIds)->delete();
+                    $this->clientRepository()->update($data['client'][0]);
+                    break;
 
-                foreach ($items as $item) {
-                    $id = Arr::pull($item, 'id');
-                    $person->{$relationship}()->updateOrCreate(['id' => $id], $item);
-                }
-            });
+                case TypePersons::TEACHER;
+
+                    break;
+                case TypePersons::STUDENT;
+
+                    $this->studentRepository()->update($data['student'][0]);
+                    break;
+            }
+
+            $this->userRepository()->update($data['user'][0]);
+            if (isset($data['addresses'])) {
+
+                $this->addressRepository()->updateForPerson($person->id, $data['addresses']);
+                $person->load('addresses.city.state', 'user');
+            }
+
+            if (isset($data['contacts'])) {
+                $this->contactRepository()->updateForPerson($person->id, $data['contacts']);
+            }
 
             $person->update($data);
         });
 
-        return new PersonResource($person);
+        match ($data['type']) {
+            'client' => $person->load('client'),
+            'teacher' => $person->load('teacher'),
+            'student' => $person->load('student'),
+            default => null
+        };
+
+
+        return $person;
     }
 
-    public function destroy(Person $person)
+    public function destroy(int|string $personId)
     {
-
+        $person = $this->model::findOrFail($personId);
         $person->delete();
-
-        return new PersonResource($person);
+        return response()->noContent();
     }
 
-    public function restore(int $id)
+    public function restore(int|string $id)
     {
         $pessoa = $this->model::withTrashed()->findOrFail($id);
-
-
         $pessoa->restore();
-
-        return new PersonResource($pessoa);
+        return $pessoa;
     }
 }

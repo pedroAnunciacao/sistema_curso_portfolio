@@ -2,43 +2,56 @@
 
 namespace App\Services;
 
-use App\Repositories\CourseRepository;
 use Illuminate\Http\Request;
-use App\Models\Course;
-use App\Http\Requests\StoreCourseRequest;
-use App\Http\Requests\UpdateCourseRequest;
+use App\Repositories\Contracts\CourseRepositoryInterface;
 
 class CourseService
 {
-    protected $repository;
+    protected CourseRepositoryInterface $repository;
 
-    public function __construct(CourseRepository $repository)
+    public function __construct(CourseRepositoryInterface $repository)
     {
         $this->repository = $repository;
     }
 
-    public function index(Request $request)
+    public function index(array $queryParams)
     {
-        return $this->repository->index($request);
+        return $this->repository->index($queryParams);
     }
 
-    public function show(Course $course)
+    public function show(int $courseId)
     {
-        return $this->repository->show($course);
+        return $this->repository->show($courseId);
     }
 
-    public function store(StoreCourseRequest $request)
+    public function store(array $data)
     {
-        return $this->repository->store($request->course);
+        if ($data['image']) {
+            $url = UploadFileService::uploadImages($data['image']);
+            $data["image"] = $url['url'];
+        }
+
+        return $this->repository->store($data);
     }
 
-    public function update(UpdateCourseRequest $request, Course $course)
+    public function update(array $data)
     {
-        return $this->repository->store($request->course, $course);
+        if ($data['image']) {
+            $url = UploadFileService::uploadImages($data['image']);
+            $data["image"] = $url['url'];
+        }
+
+        return $this->repository->update($data);
     }
 
-    public function destroy(Course $course)
+
+    public function byTeacher(array $queryParams)
     {
-        return $this->repository->destroy($course);
+        return $this->repository->byTeacher($queryParams);
+    }
+
+    public function destroy(int $courseId)
+    {
+        return $this->repository->destroy($courseId);
     }
 }

@@ -11,6 +11,8 @@
     "require": {
         "php": "^8.2",
         "bensampo/laravel-enum": "^6.12",
+        "guzzlehttp/guzzle": "*",
+        "kreait/laravel-firebase": "^6.1",
         "laravel/framework": "^12.0",
         "laravel/passport": "^13.2",
         "laravel/tinker": "^2.10.1",

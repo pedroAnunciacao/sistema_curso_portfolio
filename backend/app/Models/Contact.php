@@ -17,7 +17,7 @@ class Contact extends Model implements AuditableInterface
     use HasFactory;
 
 
-    protected $with = ['type'];
+    protected $with = ['Type'];
 
     protected $fillable = ['content', 'contact_type_id'];
 
@@ -32,7 +32,7 @@ class Contact extends Model implements AuditableInterface
         return $this->belongsTo(Person::class);
     }
 
-    public function type()
+    public function Type()
     {
         return $this->belongsTo(ContactType::class, 'contact_type_id');
     }

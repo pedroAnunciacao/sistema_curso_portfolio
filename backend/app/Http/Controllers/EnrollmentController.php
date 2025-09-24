@@ -20,7 +20,6 @@ class EnrollmentController extends Controller
 
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Enrollment::class);
 
         $perPage = (int) $request->get('page_size') ?? 10;
 
@@ -47,14 +46,12 @@ class EnrollmentController extends Controller
 
     public function show(Enrollment $enrollment)
     {
-        $this->authorize('view', $enrollment);
 
         return new EnrollmentResource($enrollment->load(['person', 'course']));
     }
 
     public function store(Request $request)
     {
-        $this->authorize('create', Enrollment::class);
 
         $enrollment = $this->repository->create($request->all());
 
@@ -63,7 +60,6 @@ class EnrollmentController extends Controller
 
     public function update(Request $request, Enrollment $enrollment)
     {
-        $this->authorize('update', $enrollment);
 
         $enrollment->update($request->all());
 
@@ -72,7 +68,6 @@ class EnrollmentController extends Controller
 
     public function destroy(Enrollment $enrollment)
     {
-        $this->authorize('delete', $enrollment);
 
         $enrollment->delete();
 

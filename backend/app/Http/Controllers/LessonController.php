@@ -20,7 +20,6 @@ class LessonController extends Controller
 
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Lesson::class);
 
         $perPage = (int) $request->get('page_size') ?? 10;
 
@@ -43,14 +42,12 @@ class LessonController extends Controller
 
     public function show(Lesson $lesson)
     {
-        $this->authorize('view', $lesson);
 
         return new LessonResource($lesson->load(['course']));
     }
 
     public function store(Request $request)
     {
-        $this->authorize('create', Lesson::class);
 
         $lesson = $this->repository->create($request->all());
 
@@ -59,7 +56,6 @@ class LessonController extends Controller
 
     public function update(Request $request, Lesson $lesson)
     {
-        $this->authorize('update', $lesson);
 
         $lesson->update($request->all());
 
@@ -68,7 +64,6 @@ class LessonController extends Controller
 
     public function destroy(Lesson $lesson)
     {
-        $this->authorize('delete', $lesson);
 
         $lesson->delete();
 

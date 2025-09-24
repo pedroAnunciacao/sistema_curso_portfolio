@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePersonRequest;
-use App\Http\Requests\UpdateCourseRequest;
-use App\Http\Resources\CourseResource;
-use App\Models\Person;
+use App\Http\Requests\Person\StorePersonRequest;
+use App\Http\Requests\Person\UpdatePersonRequest;
+use App\Http\Resources\Person\PersonResource;
 use Illuminate\Http\Request;
 use App\Services\PersonService;
 
@@ -20,30 +19,32 @@ class PersonController extends Controller
 
     public function index(Request $request)
     {
-
-        return $this->service->index($request);
+        $queryParams = $request->query('queryParams') ?? [];
+        $persons = $this->service->index($queryParams);
+        return PersonResource::collection($persons);
     }
 
     public function show(int $id)
     {
-
-        return $this->service->show($id);
+        $person =   $this->service->show($id);
+        return new PersonResource($person);
     }
 
     public function store(StorePersonRequest $request)
     {
-        return  $this->service->store($request);
+        $person = $this->service->store($request->person);
+        return new PersonResource($person);
     }
 
-    public function update(UpdateCourseRequest $request, Person $person)
+    public function update(UpdatePersonRequest $request)
     {
 
-        return  $this->service->update($request->person, $person);
+        $person = $this->service->update($request->person);
+        return new PersonResource($person);
     }
 
-    public function destroy(Person $person)
+    public function destroy(int $id)
     {
-
-        return  $this->service->destroy($person);
+        return  $this->service->destroy($id);
     }
 }

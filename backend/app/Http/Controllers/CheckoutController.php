@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Services\CheckoutService;
-use App\Http\Requests\CheckoutPixRequest;
-use App\Http\Requests\CheckoutCardRequest;
-use App\Http\Requests\CheckoutBoletoRequest;
+use App\Http\Requests\Checkout\CheckoutPixRequest;
+use App\Http\Requests\Checkout\CheckoutCardRequest;
+use App\Http\Requests\Checkout\CheckoutBoletoRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;

@@ -7,7 +7,7 @@ use App\Scopes\ClientScope;
 
 trait BelongsToClient
 {
-    public static function bootBelongsToTeacher(): void
+    public static function bootBelongsToClient(): void
     {
         static::addGlobalScope(new ClientScope());
 

@@ -10,10 +10,11 @@ use Illuminate\Http\Response;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Models\Checkout;
 use App\Traits\ResolvesTransactionId;
+use App\Traits\ResolveTeacherIdForModelType;
 
 class CheckoutService
 {
-    use PaymentLogger, ResolvesTransactionId;
+    use PaymentLogger, ResolvesTransactionId, ResolveTeacherIdForModelType;
 
     protected $adapter;
     protected $exceptionClass;
@@ -39,11 +40,12 @@ class CheckoutService
         try {
             $pix = $this->adapter->createPix($payload);
             $checkout = $this->repository->create([
-            'transaction_id' => $this->resolveTransactionId($pix),
+                'transaction_id' => $this->resolveTransactionId($pix),
                 'method' => 'pix',
                 'status' => $pix['status'],
                 'model_type' => $payload['model_type'] ?? null,
                 'model_id' => $payload['model_id'] ?? null,
+                'teacher_id' => $this->resolveTeacherId($payload['model_type'], $payload['model_id']),
                 'data' => $pix
             ]);
 
@@ -64,11 +66,13 @@ class CheckoutService
         try {
             $card = $this->adapter->createCard($payload);
             $checkout = $this->repository->create([
-            'transaction_id' => $this->resolveTransactionId($card),
+                'transaction_id' => $this->resolveTransactionId($card),
                 'method' => 'card',
                 'status' => $card['status'],
                 'model_type' => $payload['model_type'] ?? null,
                 'model_id' => $payload['model_id'] ?? null,
+                'teacher_id' => $this->resolveTeacherId($payload['model_type'], $payload['model_id']),
+
                 'data' => $card
             ]);
 
@@ -89,11 +93,13 @@ class CheckoutService
         try {
             $boleto = $this->adapter->createBoleto($payload);
             $checkout = $this->repository->create([
-            'transaction_id' => $this->resolveTransactionId($boleto),
+                'transaction_id' => $this->resolveTransactionId($boleto),
                 'method' => 'boleto',
                 'status' => $boleto['status'],
                 'model_type' => $payload['model_type'] ?? null,
                 'model_id' => $payload['model_id'] ?? null,
+                'teacher_id' => $this->resolveTeacherId($payload['model_type'], $payload['model_id']),
+
                 'data' => $boleto
             ]);
 

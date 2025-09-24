@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\UserResource;
+use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -48,7 +48,7 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        $user = $request->user()->loadMissing('person');
+        $user = $request->user()->loadMissing('person.client', 'person.student');
 
         return new UserResource($user);
     }

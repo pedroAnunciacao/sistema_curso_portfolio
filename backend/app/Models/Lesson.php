@@ -18,6 +18,9 @@ class Lesson extends Model implements AuditableInterface
         'title',
         'content',
         'course_id',
+        'image',
+        "link_youtube"
+
     ];
 
     public function transformAudit(array $data): array

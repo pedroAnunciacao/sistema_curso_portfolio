@@ -22,7 +22,9 @@ class Checkout extends Model implements AuditableInterface
         'status',
         'model_type',
         'model_id',
-        'data'
+        'data',
+        'teacher_id',
+        'student_id'
     ];
 
     protected $casts = [
@@ -39,7 +41,6 @@ class Checkout extends Model implements AuditableInterface
     {
         return $this->morphTo();
     }
-
 
     public function toArray()
     {

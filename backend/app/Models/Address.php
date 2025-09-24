@@ -22,7 +22,7 @@ class Address extends Model implements AuditableInterface
         'number',
         'complement',
         'neighborhood',
-        'default',
+        'is_default',
         'city_id',
     ];
 

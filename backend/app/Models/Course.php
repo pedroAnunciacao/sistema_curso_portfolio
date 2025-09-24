@@ -15,11 +15,19 @@ class Course extends Model implements AuditableInterface
 {
     use HasFactory, SoftDeletes, BelongsToTeacher, Auditable, HasFactory;
 
+    protected $casts = [
+        'created_at' => 'datetime:d/m/Y H:i:s',
+        'updated_at' => 'datetime:d/m/Y H:i:s',
+    ];
+
     protected $fillable = [
         'title',
         'description',
         'teacher_id',
+        'image'
     ];
+
+
 
     public function transformAudit(array $data): array
     {

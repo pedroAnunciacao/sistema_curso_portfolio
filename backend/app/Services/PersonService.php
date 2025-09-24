@@ -2,24 +2,24 @@
 
 namespace App\Services;
 
-use App\Repositories\PersonRepository;
 use Illuminate\Http\Request;
 use App\Models\Person;
 use App\Http\Requests\StorePersonRequest;
-use App\Http\Requests\UpdateCourseRequest;
+use App\Http\Requests\UpdatePersonRequest;
+use App\Repositories\Contracts\PersonRepositoryInterface;
 
 class PersonService
 {
-    protected $repository;
+    protected PersonRepositoryInterface $repository;
 
-    public function __construct(PersonRepository $repository)
+    public function __construct(PersonRepositoryInterface $repository)
     {
         $this->repository = $repository;
     }
 
-    public function index(Request $request)
+    public function index(array $queryParams)
     {
-        return $this->repository->index($request);
+        return $this->repository->index($queryParams);
     }
 
     public function show(int $id)
@@ -27,18 +27,22 @@ class PersonService
         return $this->repository->show($id);
     }
 
-    public function store(StorePersonRequest $request)
+    public function store(array $data)
     {
-        return $this->repository->store($request);
+        if(isset($data['client'])){
+
+        }
+        return $this->repository->store($data);
     }
 
-    public function update(UpdateCourseRequest $request, Person $person)
+    public function update(array $data)
     {
-        return $this->repository->store($request->course, $person);
+
+        return $this->repository->update($data);
     }
 
-    public function destroy(Person $person)
+    public function destroy(int $personId)
     {
-        return $this->repository->destroy($person);
+        return $this->repository->destroy($personId);
     }
 }
