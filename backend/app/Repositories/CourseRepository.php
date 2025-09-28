@@ -2,8 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Http\Requests\StoreCourseRequest;
-use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use App\Repositories\Contracts\CourseRepositoryInterface;
 use App\Repositories\Filters\FilterResolver;
@@ -23,58 +21,66 @@ class CourseRepository implements CourseRepositoryInterface
 
     public function index(array $queryParams)
     {
+        $perPage = (int) isset($queryParams['page_size']) ?? 10;
 
         $filters = [
             'title' => LikeNameFilter::class,
             'teacher.person.name' => LikeNameFilter::class,
         ];
 
-        $query = $this->model::query();
-
+        $query = $this->model->query();
         $query = FilterResolver::applyFilters($query, $filters, $queryParams);
+        $courses = $query->with(['teacher.person', 'lessons'])->paginate($perPage);
 
-        $courses = $query->with(['teacher.person', 'lessons'])->paginate(10);
-        return CourseResource::collection($courses);
+        return $courses;
     }
 
     public function show(int|string $courseId)
     {
-        $course = $this->model::findOrFail($courseId);
-        return new CourseResource($course->load(['teacher.person', 'lessons', 'students']));
+        $course = $this->model->findOrFail($courseId);
+        return $course->load(['teacher.person', 'lessons', 'students']);
     }
 
     public function byTeacher(array $queryParams)
     {
+        $perPage = (int) isset($queryParams['page_size']) ?? 10;
 
         $filters = [
             'teacher_id' => ExactMatchFilter::class,
         ];
 
-        $query = $this->model::query();
+        $query = $this->model->query();
         $query = Includes::applyIcludes($query, $queryParams['includes']);
         $query = FilterResolver::applyFilters($query, $filters, $queryParams);
-        $courses = $query->paginate($queryParams['page_size'] ?? 10);
+        $courses = $query->paginate($perPage);
 
-        return CourseResource::collection($courses);
+        return $courses;
     }
 
     public function store(array $data)
     {
-        $course = $this->model::create($data);
-        return new CourseResource($course);
+        $course = $this->model->create($data);
+        return $course;
     }
 
     public function update(array $data)
     {
-        $course = $this->model::findOrFail($data['id']);
+        $course = $this->model->findOrFail($data['id']);
         $course->update($data);
-        return new CourseResource($course);
+        return $course;
     }
 
     public function destroy(int|string $courseId)
     {
-        $course = $this->model::findOrFail($courseId);
+        $course = $this->model->findOrFail($courseId);
         $course->delete();
-        return response()->noContent();
+        return $course;
+    }
+
+    public function restore(int|string $id)
+    {
+        $course = $this->model->withTrashed()->findOrFail($id);
+        $course->restore();
+        return $course;
     }
 }

@@ -2,10 +2,6 @@
 
 namespace App\Services;
 
-use Illuminate\Http\Request;
-use App\Models\Person;
-use App\Http\Requests\StorePersonRequest;
-use App\Http\Requests\UpdatePersonRequest;
 use App\Repositories\Contracts\PersonRepositoryInterface;
 
 class PersonService
@@ -29,9 +25,6 @@ class PersonService
 
     public function store(array $data)
     {
-        if(isset($data['client'])){
-
-        }
         return $this->repository->store($data);
     }
 
@@ -41,8 +34,8 @@ class PersonService
         return $this->repository->update($data);
     }
 
-    public function destroy(int $personId)
+    public function destroy(int $id)
     {
-        return $this->repository->destroy($personId);
+        return $this->repository->destroy($id);
     }
 }

@@ -20,24 +20,24 @@ class UserRepository implements UserRepositoryInterface
 
     public function index(array $queryParams)
     {
+        $perPage = (int) isset($queryParams['page_size']) ?? 10;
 
         $filters = [
-            'title' => LikeNameFilter::class,
-            'teacher.person.name' => LikeNameFilter::class,
+            'name' => LikeNameFilter::class,
         ];
 
         $query = $this->model::query();
 
         $query = FilterResolver::applyFilters($query, $filters, $queryParams);
 
-        $users = $query->with(['teacher.person', 'lessons'])->paginate(10);
+        $users = $query->paginate($perPage);
         return UserResource::collection($users);
     }
 
     public function show(mixed $userId)
     {
         $user = $this->model::findOrFail($userId);
-        return new UserResource($user->load(['teacher.person', 'lessons', 'students']));
+        return new UserResource($user->load(['person']));
     }
 
 
@@ -60,4 +60,12 @@ class UserRepository implements UserRepositoryInterface
         $user->delete();
         return response()->noContent();
     }
+
+        public function restore(int|string $id)
+    {
+        $user = $this->model->withTrashed()->findOrFail($id);
+        $user->restore();
+        return $user;
+    }
+
 }

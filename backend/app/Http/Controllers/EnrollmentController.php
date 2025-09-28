@@ -2,75 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\EnrollmentResource;
-use App\Models\Enrollment;
+use App\Http\Resources\Enrollment\EnrollmentResource;
+use App\Http\Requests\Enrollment\StoreEnrollmenrRequest;
+use App\Http\Requests\Enrollment\UpdateEnrollmentRequest;
 use Illuminate\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
-use Illuminate\Database\Eloquent\Builder;
+use App\Services\EnrollmentService;
 
 class EnrollmentController extends Controller
 {
-    protected $repository;
+    protected $service;
 
-    public function __construct(Enrollment $repository)
+    public function __construct(EnrollmentService $service)
     {
-        $this->repository = $repository;
+        $this->service = $service;
     }
 
     public function index(Request $request)
     {
-
-        $perPage = (int) $request->get('page_size') ?? 10;
-
-        $enrollments = QueryBuilder::for($this->repository->query())
-            ->defaultSort('-id')
-            ->allowedFilters([
-                AllowedFilter::callback('course', function (Builder $query, $value) {
-                    $query->whereHas('course', function ($q) use ($value) {
-                        $q->where('title', 'ilike', "%$value%");
-                    });
-                }),
-                AllowedFilter::callback('student', function (Builder $query, $value) {
-                    $query->whereHas('person', function ($q) use ($value) {
-                        $q->where('nome', 'ilike', "%$value%");
-                    });
-                }),
-            ])
-            ->allowedIncludes(['person', 'course'])
-            ->withTrashed()
-            ->paginate($perPage);
-
+        $queryParams = $request->query('queryParams') ?? [];
+        $enrollments = $this->service->index($queryParams);
         return EnrollmentResource::collection($enrollments);
     }
 
-    public function show(Enrollment $enrollment)
+    public function show(int|string $id)
     {
-
+        $enrollment = $this->service->show($id);
         return new EnrollmentResource($enrollment->load(['person', 'course']));
     }
 
-    public function store(Request $request)
+    public function store(StoreEnrollmenrRequest $request)
     {
 
-        $enrollment = $this->repository->create($request->all());
+        $enrollment = $this->service->store($request->enrollment);
 
         return new EnrollmentResource($enrollment);
     }
 
-    public function update(Request $request, Enrollment $enrollment)
+    public function update(UpdateEnrollmentRequest $request)
     {
 
-        $enrollment->update($request->all());
-
+        $enrollment = $this->service->update($request->enrollment);
         return new EnrollmentResource($enrollment);
     }
 
-    public function destroy(Enrollment $enrollment)
+    public function destroy(int|string $id)
     {
 
-        $enrollment->delete();
-
-        return response()->noContent();
+        $enrollment = $this->service->destroy($id);
+        return new EnrollmentResource($enrollment);
     }
 }

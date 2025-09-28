@@ -24,7 +24,7 @@ class MercadoPagoAdapter implements PaymentGatewayInterface
         $this->client = new PaymentClient();
     }
 
-    public function createPix(array $payload): array
+    public function processPixPayment(array $payload): array
     {
         try {
             $amount       = (float) $payload['amount'];
@@ -71,7 +71,7 @@ class MercadoPagoAdapter implements PaymentGatewayInterface
         }
     }
 
-    public function createCard(array $payload): array
+    public function processCardPayment(array $payload): array
     {
         try {
             $amount       = (float) $payload['amount'];
@@ -133,7 +133,7 @@ class MercadoPagoAdapter implements PaymentGatewayInterface
         }
     }
 
-    public function createBoleto(array $payload): array
+    public function processBoletoPayment(array $payload): array
     {
         try {
             $amount      = (float) $payload['amount'];

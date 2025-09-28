@@ -53,22 +53,22 @@ class Person extends Model implements AuditableInterface
     }
 
 
-    public function getClienteIdAttribute()
-    {
-        if ($this->student) {
-            return $this->student->client_id;
-        }
+    // public function getClienteIdAttribute()
+    // {
+    //     if ($this->student) {
+    //         return $this->student->client_id;
+    //     }
 
-        if ($this->teacher) {
-            return $this->teacher->id;
-        }
+    //     if ($this->teacher) {
+    //         return $this->teacher->id;
+    //     }
 
-        if ($this->client) {
-            return $this->client->id;
-        }
+    //     if ($this->client) {
+    //         return $this->client->id;
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 
 
     public static function getCustomColumns(): array

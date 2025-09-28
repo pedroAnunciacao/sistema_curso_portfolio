@@ -24,9 +24,9 @@ class TeacherRepository implements TeacherRepositoryInterface
         return $teachers;
     }
 
-    public function show(int|string $teacherId)
+    public function show(int|string $id)
     {
-        $teacher = $this->model::findOrFail($teacherId);
+        $teacher = $this->model::findOrFail($id);
         return $teacher->load(['person']);
     }
 
@@ -43,10 +43,17 @@ class TeacherRepository implements TeacherRepositoryInterface
         return $teacher;
     }
 
-    public function destroy(int|string $teacherId)
+    public function destroy(int|string $id)
     {
-        $teacher = $this->model::findOrFail($teacherId);
+        $teacher = $this->model->findOrFail($id);
         $teacher->delete();
         return response()->noContent();
     }
+
+    public function restore(int|string $id)
+    {
+        $teacher = $this->model->withTrashed()->findOrFail($id);
+        $teacher->restore();
+        return $teacher;
+    }    
 }

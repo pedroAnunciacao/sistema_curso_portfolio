@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Checkout;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Teacher\TeacherResource;
@@ -9,7 +9,6 @@ class CheckoutResource extends JsonResource
 {
     public function toArray($request): array
     {
-        // Gateway ativo
         $activeGateway = app('client')->gateways('config.payments.integrations.useConfig.active');
 
         return [
@@ -21,12 +20,8 @@ class CheckoutResource extends JsonResource
             'model_id' => $this->model_id,
             'teacher' => new TeacherResource($this->whenLoaded('teacher')),
             'student' => new StudentResource($this->whenLoaded('student')),
-
             'model' => $this->whenLoaded('model', fn() => $this->model ? $this->getPolymorphicResource($this->model) : null),
-
-            // nó com o gateway ativo
             $activeGateway => $this->data,
-
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

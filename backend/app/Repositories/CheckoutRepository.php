@@ -2,15 +2,13 @@
 
 namespace App\Repositories;
 
-use App\Http\Resources\CheckoutResource;
 use App\Models\Checkout;
-use Illuminate\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
-use Illuminate\Http\Response;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use App\Repositories\Filters\FilterResolver;
+use App\Repositories\Filters\ExactMatchFilter;
+use App\Repositories\Includes\Includes;
+use App\Repositories\Contracts\CheckoutRepositoryInterface;
 
-class CheckoutRepository
+class CheckoutRepository implements CheckoutRepositoryInterface
 {
     protected $model;
 
@@ -19,46 +17,66 @@ class CheckoutRepository
         $this->model = $model;
     }
 
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(array $queryParams)
     {
-        $perPage = (int) $request->get('page_size') ?? 10;
 
-        $checkout = QueryBuilder::for($this->model->query())
-            ->defaultSort('-id')
-            ->allowedFilters([
-                AllowedFilter::exact('transaction_id'),
-                AllowedFilter::exact('model_id'),
-                AllowedFilter::exact('model_type'),
-                AllowedFilter::exact('method'),
-                AllowedFilter::exact('status'),
-            ])
-            ->allowedIncludes(['model','teacher', 'student'])
-            ->withTrashed()
-            ->paginate($perPage);
-        return CheckoutResource::collection($checkout);
+        $query = $this->model::query();
+        $perPage = (int) isset($queryParams['page_size']) ?? 10;
+        $filters = [
+            'client_id' => ExactMatchFilter::class,
+            'teacher_id' => ExactMatchFilter::class,
+            'student_id' => ExactMatchFilter::class,
+            'transaction_id' => ExactMatchFilter::class,
+            'model_id' => ExactMatchFilter::class,
+            'model_type' => ExactMatchFilter::class,
+            'method' => ExactMatchFilter::class,
+            'status' => ExactMatchFilter::class,
+
+        ];
+
+        $query =  !empty($queryParams['includes']) ? Includes::applyIcludes($query, $queryParams['includes']) : $query;
+        $query = FilterResolver::applyFilters($query, $filters, $queryParams);
+
+        $checkouts = $query->paginate($perPage);
+
+        return $checkouts;
     }
 
-    public function create(array $data): Checkout
+    public function show(int|string $id)
     {
-        return $this->model->create($data);
+        $checkout = $this->model->findOrFail($id);
+        return $checkout->load(['model']);
     }
 
-    public function findByTransactionId(string $transactionId): ?Checkout
+    public function store(array $data)
+    {
+        $checkout = $this->model->create($data);
+        return $checkout;
+    }
+
+    public function update(array $data)
+    {
+        $checkout = $this->model->findOrFail($data['checkout_id']);
+        $checkout->update($data);
+        return $checkout;
+    }
+
+    public function destroy(int|string $id)
+    {
+        $checkout = $this->model->findOrFail($id);
+        $checkout->delete();
+        return response()->noContent();
+    }
+
+    public function restore(int|string $id)
+    {
+        $pessoa = $this->model->withTrashed()->findOrFail($id);
+        $pessoa->restore();
+        return $pessoa;
+    }
+
+    public function findByTransactionId(string $transactionId)
     {
         return $this->model->where('transaction_id', $transactionId)->first();
-    }
-
-    public function updateStatus(string $transactionId, string $status, array $data = []): bool
-    {
-        $checkout = $this->findByTransactionId($transactionId);
-
-        if (! $checkout) {
-            return false;
-        }
-
-        return $checkout->update([
-            'status' => $status,
-            'data'   => array_merge($checkout->data ?? [], $data)
-        ]);
     }
 }

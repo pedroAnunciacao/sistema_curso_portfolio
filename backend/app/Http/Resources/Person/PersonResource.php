@@ -8,6 +8,8 @@ use App\Http\Resources\Client\ClientResource;
 use App\Http\Resources\Teacher\TeacherResource;
 use App\Http\Resources\Student\StudentResource;
 use App\Http\Resources\Addresses\AddressesResource;
+use Mockery\Undefined;
+
 class PersonResource extends JsonResource
 {
     public function toArray($request): array
@@ -16,9 +18,20 @@ class PersonResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'user' => new UserResource($this->whenLoaded('user')),
-            'client' => new ClientResource($this->whenLoaded('client')) ,
-            'teacher' => new TeacherResource($this->whenLoaded('teacher')),
-            'student' => new StudentResource($this->whenLoaded('student')),
+            'client' => $this->when(
+                $this->client !== null,
+                new ClientResource($this->client)
+            ),
+            'teacher' => $this->when(
+                $this->teacher !== null,
+                new TeacherResource($this->teacher)
+            ),
+
+            'student' => $this->when(
+                $this->student !== null,
+                new StudentResource($this->student)
+            ),
+
             'Addresses' => new AddressesResource($this->whenLoaded('addresses')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Illuminate\Http\Request;
 use App\Repositories\Contracts\CourseRepositoryInterface;
 
 class CourseService
@@ -19,9 +18,9 @@ class CourseService
         return $this->repository->index($queryParams);
     }
 
-    public function show(int $courseId)
+    public function show(int $id)
     {
-        return $this->repository->show($courseId);
+        return $this->repository->show($id);
     }
 
     public function store(array $data)
@@ -50,8 +49,8 @@ class CourseService
         return $this->repository->byTeacher($queryParams);
     }
 
-    public function destroy(int $courseId)
+    public function destroy(int $id)
     {
-        return $this->repository->destroy($courseId);
+        return $this->repository->destroy($id);
     }
 }

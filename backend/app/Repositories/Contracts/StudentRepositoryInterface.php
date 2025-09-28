@@ -5,8 +5,8 @@ namespace App\Repositories\Contracts;
 interface StudentRepositoryInterface
 {
     public function index(array $queryParams);
-    public function show(int|string $studentId);
+    public function show(int|string $student_id);
     public function store(array $data);
     public function update(array $data);
-    public function destroy(int|string $studentId);
-}
+    public function destroy(int|string $student_id);
+    public function restore(int|string $student_id);}

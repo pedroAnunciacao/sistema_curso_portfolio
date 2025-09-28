@@ -2,71 +2,67 @@
 
 namespace App\Repositories;
 
-use App\Http\Resources\LessonResource;
 use App\Models\Lesson;
-use Illuminate\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
-use Illuminate\Database\Eloquent\Builder;
+use App\Repositories\Contracts\EnrollmentRepositoryInterface;
+use App\Repositories\Filters\FilterResolver;
+use App\Repositories\Filters\LikeNameFilter;
+use App\Repositories\Includes\Includes;
 
-class LessonRepository
+class LessonRepository implements EnrollmentRepositoryInterface
 {
-    protected $repository;
+    protected $model;
 
-    public function __construct(Lesson $repository)
+    public function __construct(Lesson $model)
     {
-        $this->repository = $repository;
+        $this->model = $model;
     }
 
-    public function index(Request $request)
+    public function index(array $queryParams)
     {
 
-        $perPage = (int) $request->get('page_size') ?? 10;
+        $query = $this->model->query();
+        $perPage = (int) isset($queryParams['page_size']) ?? 10;
+        $filters = [
+            'title' => LikeNameFilter::class,
+        ];
 
-        $lessons = QueryBuilder::for($this->repository->query())
-            ->defaultSort('-id')
-            ->allowedFilters([
-                AllowedFilter::partial('title'),
-                AllowedFilter::callback('course', function (Builder $query, $value) {
-                    $query->whereHas('course', function ($q) use ($value) {
-                        $q->where('title', 'ilike', "%$value%");
-                    });
-                }),
-            ])
-            ->allowedIncludes(['course'])
-            ->withTrashed()
-            ->paginate($perPage);
+        $query =  !empty($queryParams['includes']) ? Includes::applyIcludes($query, $queryParams['includes']) : $query;
+        $query = FilterResolver::applyFilters($query, $filters, $queryParams);
 
-        return LessonResource::collection($lessons);
+        $lessons = $query->paginate($perPage);
+        return $lessons;
     }
 
-    public function show(Lesson $lesson)
+    public function show(int|string $state_id)
     {
-
-        return new LessonResource($lesson->load(['course']));
+        $query = $this->model->findOrFail($state_id);
+        $lesson = $query->load(['course']);
+        return $lesson;
     }
 
-    public function store(Request $request)
+    public function store(array $data)
     {
-
-        $lesson = $this->repository->create($request->all());
-
-        return new LessonResource($lesson);
+        return $this->model::create($data);
     }
 
-    public function update(Request $request, Lesson $lesson)
+    public function update(array $data)
     {
-
-        $lesson->update($request->all());
-
-        return new LessonResource($lesson);
+        $query = $this->model::findOrFail($data['id']);
+        $lesson = $query->update($data);
+        return $lesson;
     }
 
-    public function destroy(Lesson $lesson)
+    public function destroy(int|string $id)
     {
-
+        $lesson = $this->model->findOrFail($id);
         $lesson->delete();
-
         return response()->noContent();
+    }
+
+    public function restore(int|string $id)
+    {
+        $lesson = $this->model->withTrashed()->findOrFail($id);
+        $lesson->restore();
+        return $lesson;
     }
 }

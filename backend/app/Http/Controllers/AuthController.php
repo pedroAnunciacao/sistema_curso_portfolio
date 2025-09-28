@@ -27,14 +27,12 @@ class AuthController extends Controller
         $response = app()->handle($request);
         $content = json_decode($response->getContent(), true); // decodifica como array
 
-        // Se houver erro no login, retorna error_description
         if (isset($content['error'])) {
             return response()->json([
                 'error' => $content['error_description'] ?? $content['error']
             ], $response->getStatusCode());
         }
 
-        // Caso sucesso, retorna tokens
         return response()->json([
             'tokenType' => $content['token_type'],
             'expiresIn' => $content['expires_in'],
@@ -48,7 +46,19 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        $user = $request->user()->loadMissing('person.client', 'person.student');
+        $user = $request->user();
+
+        if($user->person->client){
+           $user->loadMissing('person.client'); 
+        }
+
+        if($user->person->teacher){
+           $user->loadMissing('person.teacher'); 
+        }
+
+        if($user->person->student){
+           $user->loadMissing('person.student'); 
+        }
 
         return new UserResource($user);
     }

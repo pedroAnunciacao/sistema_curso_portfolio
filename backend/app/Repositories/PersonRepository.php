@@ -6,11 +6,11 @@ namespace App\Repositories;
 
 use App\Repositories\Contracts\PersonRepositoryInterface;
 use App\Enums\TypePersons;
-use App\Http\Resources\PersonResource;
 use App\Models\Person;
 use Illuminate\Support\Facades\DB;
 use App\Repositories\Filters\FilterResolver;
 use App\Repositories\Filters\LikeNameFilter;
+use App\Repositories\Includes\Includes;
 
 
 class PersonRepository implements PersonRepositoryInterface
@@ -99,24 +99,23 @@ class PersonRepository implements PersonRepositoryInterface
     public function index(array $queryParams)
     {
 
+        $query = $this->model::query();
         $perPage = (int) isset($queryParams['page_size']) ?? 10;
-
         $filters = [
             'name' => LikeNameFilter::class,
         ];
 
-        $query = $this->model::query();
-
+        $query =  !empty($queryParams['includes']) ? Includes::applyIcludes($query, $queryParams['includes']) : $query;
         $query = FilterResolver::applyFilters($query, $filters, $queryParams);
 
-        $persons = $query->with(['client', 'teacher', 'student'])->paginate();
+        $persons = $query->paginate($perPage);
 
         return $persons;
     }
 
-    public function show(int|string $personId)
+    public function show(int|string $id)
     {
-        $person = $this->model::findOrFail($personId);
+        $person = $this->model::findOrFail($id);
         return $person;
     }
 
@@ -219,19 +218,19 @@ class PersonRepository implements PersonRepositoryInterface
 
 
         return $person;
-    }
+    }   
 
-    public function destroy(int|string $personId)
+    public function destroy(int|string $id)
     {
-        $person = $this->model::findOrFail($personId);
+        $person = $this->model->findOrFail($id);
         $person->delete();
         return response()->noContent();
     }
 
     public function restore(int|string $id)
     {
-        $pessoa = $this->model::withTrashed()->findOrFail($id);
-        $pessoa->restore();
-        return $pessoa;
+        $person = $this->model->withTrashed()->findOrFail($id);
+        $person->restore();
+        return $person;
     }
 }
