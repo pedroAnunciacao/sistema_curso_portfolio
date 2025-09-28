@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use OwenIt\Auditing\Models\Audit;
 use App\Repositories\Contracts\AuditRepositoryInterface;
+use App\Repositories\Filters\ExactMatchFilter;
+use App\Repositories\Filters\FilterResolver;
 
 class AuditRepository implements AuditRepositoryInterface
 {
@@ -11,25 +13,19 @@ class AuditRepository implements AuditRepositoryInterface
     {
         $query = Audit::query();
 
-        if (!empty($filters['user_id'])) {
-            $query->where('user_id', $filters['user_id']);
-        }
 
-        if (!empty($filters['auditable_type'])) {
-            $query->where('auditable_type', $filters['auditable_type']);
-        }
+        $filters = [
+            'user_id' => ExactMatchFilter::class,
+            'auditable_type' => ExactMatchFilter::class,
+            'auditable_id' => ExactMatchFilter::class,
+            'date_from' => ExactMatchFilter::class,
+            'date_to' => ExactMatchFilter::class,
 
-        if (!empty($filters['auditable_id'])) {
-            $query->where('auditable_id', $filters['auditable_id']);
-        }
+        ];
 
-        if (!empty($filters['date_from'])) {
-            $query->whereDate('created_at', '>=', $filters['date_from']);
-        }
+        $query = FilterResolver::applyFilters($query, $filters, $queryParams);
 
-        if (!empty($filters['date_to'])) {
-            $query->whereDate('created_at', '<=', $filters['date_to']);
-        }
+
 
         return $query->latest()->get();
     }
