@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { AuthProvider } from "./context/AuthContext";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -18,49 +20,176 @@ import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
+import CourseList from "./pages/Courses/CourseList";
+import CourseForm from "./pages/Courses/CourseForm";
+import CourseDetails from "./pages/Courses/CourseDetails";
+import CoursePurchase from "./pages/Courses/CoursePurchase";
+import LessonForm from "./pages/Lessons/LessonForm";
+import PeopleList from "./pages/People/PeopleList";
+import StudentLayout from "./pages/Student/StudentLayout";
+import StudentDashboard from "./pages/Student/StudentDashboard";
+import StudentCourses from "./pages/Student/StudentCourses";
+import MyCourses from "./pages/Student/MyCourses";
+import StudentPurchases from "./pages/Student/StudentPurchases";
+import Unauthorized from "./pages/Unauthorized";
 
 export default function App() {
   return (
-    <>
+    <AuthProvider>
       <Router>
         <ScrollToTop />
         <Routes>
-          {/* Dashboard Layout */}
+          {/* Student Layout */}
+          <Route element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <StudentLayout />
+            </ProtectedRoute>
+          }>
+            <Route path="/student" element={<StudentDashboard />} />
+            <Route path="/student/courses" element={<StudentCourses />} />
+            <Route path="/student/my-courses" element={<MyCourses />} />
+            <Route path="/student/purchases" element={<StudentPurchases />} />
+          </Route>
+
+          {/* Admin/Teacher Dashboard Layout */}
           <Route element={<AppLayout />}>
-            <Route index path="/" element={<Home />} />
+            <Route index path="/" element={
+              <ProtectedRoute allowedRoles={['client', 'teacher']}>
+                <Home />
+              </ProtectedRoute>
+            } />
+
+            {/* Courses */}
+            <Route path="/courses" element={
+              <ProtectedRoute>
+                <CourseList />
+              </ProtectedRoute>
+            } />
+            <Route path="/courses/create" element={
+              <ProtectedRoute allowedRoles={['client', 'teacher']}>
+                <CourseForm />
+              </ProtectedRoute>
+            } />
+            <Route path="/courses/:id" element={
+              <ProtectedRoute>
+                <CourseDetails />
+              </ProtectedRoute>
+            } />
+            <Route path="/courses/:id/edit" element={
+              <ProtectedRoute allowedRoles={['client', 'teacher']}>
+                <CourseForm />
+              </ProtectedRoute>
+            } />
+            <Route path="/courses/:id/purchase" element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <CoursePurchase />
+              </ProtectedRoute>
+            } />
+
+            {/* Lessons */}
+            <Route path="/courses/:courseId/lessons/create" element={
+              <ProtectedRoute allowedRoles={['client', 'teacher']}>
+                <LessonForm />
+              </ProtectedRoute>
+            } />
+            <Route path="/lessons/:id/edit" element={
+              <ProtectedRoute allowedRoles={['client', 'teacher']}>
+                <LessonForm />
+              </ProtectedRoute>
+            } />
+
+            {/* People */}
+            <Route path="/people" element={
+              <ProtectedRoute allowedRoles={['client']}>
+                <PeopleList />
+              </ProtectedRoute>
+            } />
 
             {/* Others Page */}
-            <Route path="/profile" element={<UserProfiles />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/blank" element={<Blank />} />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <UserProfiles />
+              </ProtectedRoute>
+            } />
+            <Route path="/calendar" element={
+              <ProtectedRoute>
+                <Calendar />
+              </ProtectedRoute>
+            } />
+            <Route path="/blank" element={
+              <ProtectedRoute>
+                <Blank />
+              </ProtectedRoute>
+            } />
 
             {/* Forms */}
-            <Route path="/form-elements" element={<FormElements />} />
+            <Route path="/form-elements" element={
+              <ProtectedRoute>
+                <FormElements />
+              </ProtectedRoute>
+            } />
 
             {/* Tables */}
-            <Route path="/basic-tables" element={<BasicTables />} />
+            <Route path="/basic-tables" element={
+              <ProtectedRoute>
+                <BasicTables />
+              </ProtectedRoute>
+            } />
 
             {/* Ui Elements */}
-            <Route path="/alerts" element={<Alerts />} />
-            <Route path="/avatars" element={<Avatars />} />
-            <Route path="/badge" element={<Badges />} />
-            <Route path="/buttons" element={<Buttons />} />
-            <Route path="/images" element={<Images />} />
-            <Route path="/videos" element={<Videos />} />
+            <Route path="/alerts" element={
+              <ProtectedRoute>
+                <Alerts />
+              </ProtectedRoute>
+            } />
+            <Route path="/avatars" element={
+              <ProtectedRoute>
+                <Avatars />
+              </ProtectedRoute>
+            } />
+            <Route path="/badge" element={
+              <ProtectedRoute>
+                <Badges />
+              </ProtectedRoute>
+            } />
+            <Route path="/buttons" element={
+              <ProtectedRoute>
+                <Buttons />
+              </ProtectedRoute>
+            } />
+            <Route path="/images" element={
+              <ProtectedRoute>
+                <Images />
+              </ProtectedRoute>
+            } />
+            <Route path="/videos" element={
+              <ProtectedRoute>
+                <Videos />
+              </ProtectedRoute>
+            } />
 
             {/* Charts */}
-            <Route path="/line-chart" element={<LineChart />} />
-            <Route path="/bar-chart" element={<BarChart />} />
+            <Route path="/line-chart" element={
+              <ProtectedRoute>
+                <LineChart />
+              </ProtectedRoute>
+            } />
+            <Route path="/bar-chart" element={
+              <ProtectedRoute>
+                <BarChart />
+              </ProtectedRoute>
+            } />
           </Route>
 
           {/* Auth Layout */}
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
 
           {/* Fallback Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
-    </>
+    </AuthProvider>
   );
 }

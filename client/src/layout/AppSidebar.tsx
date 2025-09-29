@@ -14,8 +14,11 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  GroupIcon,
+  BoxIconLine,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
+import { useAuth } from "../context/AuthContext";
 import SidebarWidget from "./SidebarWidget";
 
 type NavItem = {
@@ -29,8 +32,34 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    path: "/",
   },
+  {
+    icon: <BoxIconLine />,
+    name: "Cursos",
+    path: "/courses",
+  },
+  {
+    icon: <GroupIcon />,
+    name: "Pessoas",
+    path: "/people",
+  },
+];
+
+const teacherItems: NavItem[] = [
+  {
+    icon: <GridIcon />,
+    name: "Dashboard",
+    path: "/",
+  },
+  {
+    icon: <BoxIconLine />,
+    name: "Meus Cursos",
+    path: "/courses",
+  },
+];
+
+const otherItems: NavItem[] = [
   {
     icon: <CalenderIcon />,
     name: "Calendar",
@@ -38,7 +67,7 @@ const navItems: NavItem[] = [
   },
   {
     icon: <UserCircleIcon />,
-    name: "User Profile",
+    name: "Perfil",
     path: "/profile",
   },
   {
@@ -94,7 +123,9 @@ const othersItems: NavItem[] = [
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { getUserRole } = useAuth();
   const location = useLocation();
+  const userRole = getUserRole();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
     type: "main" | "others";
@@ -111,10 +142,25 @@ const AppSidebar: React.FC = () => {
     [location.pathname]
   );
 
+  // Determinar quais itens mostrar baseado no role do usuário
+  const getNavigationItems = () => {
+    if (userRole === 'teacher') {
+      return teacherItems;
+    }
+    return navItems;
+  };
+
+  const getOtherItems = () => {
+    if (userRole === 'teacher') {
+      return otherItems.filter(item => item.name !== 'Forms' && item.name !== 'Tables' && item.name !== 'Pages');
+    }
+    return otherItems;
+  };
+
   useEffect(() => {
     let submenuMatched = false;
     ["main", "others"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : othersItems;
+      const items = menuType === "main" ? getNavigationItems() : getOtherItems();
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
@@ -133,7 +179,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [location, isActive]);
+  }, [location, isActive, userRole]);
 
   useEffect(() => {
     if (openSubmenu !== null) {
@@ -365,7 +411,7 @@ const AppSidebar: React.FC = () => {
                 )}
               </h2>
               {renderMenuItems(othersItems, "others")}
-            </div>
+            {renderMenuItems(getOtherItems(), "others")}
           </div>
         </nav>
         {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
