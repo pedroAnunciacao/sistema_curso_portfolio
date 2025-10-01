@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/ui/button/Button';
 import Input from '../../components/form/input/InputField';
 import Label from '../../components/form/Label';
+import Select from '../../components/form/Select';
 import { Modal } from '../../components/ui/modal';
 import { useModal } from '../../hooks/useModal';
 
@@ -18,8 +19,9 @@ export default function CoursePurchase() {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card' | 'boleto'>('pix');
+  const [selectedEmail, setSelectedEmail] = useState<string>('');
   const [paymentData, setPaymentData] = useState({
-    amount: 199.90,
+    amount: 0,
     description: '',
     payer: {
       email: '',
@@ -32,13 +34,17 @@ export default function CoursePurchase() {
     }
   });
   const [cardData, setCardData] = useState({
-    id: '',
     card_number: '',
+    security_code: '',
+    expiration_month: '',
+    expiration_year: '',
+    cardholder_name: '',
     installments: 1
   });
 
   const { isOpen, openModal, closeModal } = useModal();
   const [qrCode, setQrCode] = useState<string>('');
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -47,28 +53,32 @@ export default function CoursePurchase() {
   }, [id]);
 
   useEffect(() => {
-    if (user?.person) {
+    if (user?.person && course) {
+      // Pegar emails disponíveis do usuário
+      const emailContacts = user.person.Contacts?.filter(contact => contact.type === 'E-mail') || [];
+      
       setPaymentData(prev => ({
         ...prev,
+        amount: parseFloat(course.price?.replace(',', '.') || '0'),
+        description: `Curso: ${course.title}`,
         payer: {
           ...prev.payer,
-          email: user.person.name + '@email.com', // Ajustar conforme necessário
+          email: emailContacts[0]?.conteudo || '',
           first_name: user.person.name.split(' ')[0] || '',
           last_name: user.person.name.split(' ').slice(1).join(' ') || ''
         }
       }));
+
+      if (emailContacts.length > 0) {
+        setSelectedEmail(emailContacts[0].conteudo);
+      }
     }
-  }, [user]);
+  }, [user, course]);
 
   const loadCourse = async () => {
     try {
       const response = await apiService.getCourse(Number(id));
-      const courseData = response.data;
-      setCourse(courseData);
-      setPaymentData(prev => ({
-        ...prev,
-        description: `Curso: ${courseData.title}`
-      }));
+      setCourse(response.data);
     } catch (error) {
       console.error('Error loading course:', error);
     } finally {
@@ -78,8 +88,13 @@ export default function CoursePurchase() {
 
   const handlePixPayment = async () => {
     try {
+      setProcessingPayment(true);
       const pixPaymentData = {
         ...paymentData,
+        payer: {
+          ...paymentData.payer,
+          email: selectedEmail
+        },
         model_type: 'courses',
         model_id: Number(id),
         expiration_minutes: 30
@@ -87,61 +102,98 @@ export default function CoursePurchase() {
 
       const response = await apiService.processPixPayment(pixPaymentData);
       
-      if (response.data?.mercado_pago?.qr_code) {
-        setQrCode(response.data.mercado_pago.qr_code);
+      if (response.data?.mercado_pago?.qr_code_base64) {
+        setQrCode(response.data.mercado_pago.qr_code_base64);
         openModal();
       }
     } catch (error) {
       console.error('Error processing PIX payment:', error);
       alert('Erro ao processar pagamento PIX');
+    } finally {
+      setProcessingPayment(false);
     }
   };
 
   const handleCardPayment = async () => {
     try {
+      setProcessingPayment(true);
+      
+      // Primeiro, criar o token do cartão
+      const tokenData = {
+        card_number: cardData.card_number.replace(/\s/g, ''),
+        security_code: cardData.security_code,
+        expiration_month: parseInt(cardData.expiration_month),
+        expiration_year: parseInt(cardData.expiration_year),
+        cardholder: {
+          name: cardData.cardholder_name,
+          identification: {
+            type: paymentData.payer.identification.type,
+            number: paymentData.payer.identification.number
+          }
+        }
+      };
+
+      const tokenResponse = await apiService.createCardToken(tokenData);
+      
+      // Depois, processar o pagamento
       const cardPaymentData = {
         ...paymentData,
-        card: cardData,
+        payer: {
+          ...paymentData.payer,
+          email: selectedEmail
+        },
+        card: {
+          id: tokenResponse.id,
+          card_number: cardData.card_number.replace(/\s/g, '')
+        },
+        installments: cardData.installments,
         model_type: 'courses',
         model_id: Number(id)
       };
 
       const response = await apiService.processCardPayment(cardPaymentData);
       alert('Pagamento processado com sucesso!');
-      navigate('/my-courses');
+      navigate('/student/my-courses');
     } catch (error) {
       console.error('Error processing card payment:', error);
       alert('Erro ao processar pagamento com cartão');
+    } finally {
+      setProcessingPayment(false);
     }
   };
 
   const handleBoletoPayment = async () => {
     try {
+      setProcessingPayment(true);
       const boletoPaymentData = {
         ...paymentData,
-        model_type: 'courses',
-        model_id: Number(id),
         payer: {
           ...paymentData.payer,
+          email: selectedEmail,
           address: {
-            zip_code: '01310-100',
-            street_name: 'Av. Paulista',
-            street_number: '1000',
-            neighborhood: 'Bela Vista',
+            zip_code: user?.person?.Addresses?.zip_code || '01310-100',
+            street_name: user?.person?.Addresses?.street || 'Av. Paulista',
+            street_number: user?.person?.Addresses?.number || '1000',
+            neighborhood: user?.person?.Addresses?.neighborhood || 'Centro',
             city: 'São Paulo',
             federal_unit: 'SP'
           }
-        }
+        },
+        model_type: 'courses',
+        model_id: Number(id)
       };
 
       const response = await apiService.processBoletoPayment(boletoPaymentData);
       
       if (response.data?.mercado_pago?.ticket_url) {
         window.open(response.data.mercado_pago.ticket_url, '_blank');
+        alert('Boleto gerado com sucesso! Uma nova aba foi aberta para download.');
       }
     } catch (error) {
       console.error('Error processing boleto payment:', error);
       alert('Erro ao processar pagamento por boleto');
+    } finally {
+      setProcessingPayment(false);
     }
   };
 
@@ -174,6 +226,11 @@ export default function CoursePurchase() {
       </div>
     );
   }
+
+  const emailOptions = user?.person?.Contacts?.filter(contact => contact.type === 'E-mail').map(contact => ({
+    value: contact.conteudo,
+    label: contact.conteudo
+  })) || [];
 
   return (
     <>
@@ -249,9 +306,43 @@ export default function CoursePurchase() {
                   Total:
                 </span>
                 <span className="text-xl font-bold text-brand-600 dark:text-brand-400">
-                  R$ {paymentData.amount.toFixed(2)}
+                  R$ {course.price || '0,00'}
                 </span>
               </div>
+            </div>
+
+            {/* Email Selection */}
+            {emailOptions.length > 1 && (
+              <div className="mb-6">
+                <Label>Email para Pagamento</Label>
+                <Select
+                  options={emailOptions}
+                  placeholder="Selecione um email"
+                  onChange={setSelectedEmail}
+                  defaultValue={selectedEmail}
+                />
+              </div>
+            )}
+
+            {/* CPF */}
+            <div className="mb-6">
+              <Label>CPF</Label>
+              <Input
+                type="text"
+                value={paymentData.payer.identification.number}
+                onChange={(e) => setPaymentData(prev => ({
+                  ...prev,
+                  payer: {
+                    ...prev.payer,
+                    identification: {
+                      ...prev.payer.identification,
+                      number: e.target.value
+                    }
+                  }
+                }))}
+                placeholder="000.000.000-00"
+                required
+              />
             </div>
 
             {/* Payment Method Selection */}
@@ -300,13 +391,59 @@ export default function CoursePurchase() {
             {paymentMethod === 'card' && (
               <div className="space-y-4 mb-6">
                 <div>
+                  <Label>Nome no Cartão</Label>
+                  <Input
+                    type="text"
+                    value={cardData.cardholder_name}
+                    onChange={(e) => setCardData(prev => ({ ...prev, cardholder_name: e.target.value }))}
+                    placeholder="Nome como está no cartão"
+                    required
+                  />
+                </div>
+                <div>
                   <Label>Número do Cartão</Label>
                   <Input
                     type="text"
                     value={cardData.card_number}
                     onChange={(e) => setCardData(prev => ({ ...prev, card_number: e.target.value }))}
                     placeholder="1234 5678 9012 3456"
+                    required
                   />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label>Mês</Label>
+                    <Input
+                      type="text"
+                      value={cardData.expiration_month}
+                      onChange={(e) => setCardData(prev => ({ ...prev, expiration_month: e.target.value }))}
+                      placeholder="12"
+                      maxLength={2}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Ano</Label>
+                    <Input
+                      type="text"
+                      value={cardData.expiration_year}
+                      onChange={(e) => setCardData(prev => ({ ...prev, expiration_year: e.target.value }))}
+                      placeholder="2030"
+                      maxLength={4}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>CVV</Label>
+                    <Input
+                      type="text"
+                      value={cardData.security_code}
+                      onChange={(e) => setCardData(prev => ({ ...prev, security_code: e.target.value }))}
+                      placeholder="123"
+                      maxLength={4}
+                      required
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label>Parcelas</Label>
@@ -317,7 +454,7 @@ export default function CoursePurchase() {
                   >
                     {[1, 2, 3, 6, 12].map(num => (
                       <option key={num} value={num}>
-                        {num}x de R$ {(paymentData.amount / num).toFixed(2)}
+                        {num}x de R$ {(paymentData.amount / num).toFixed(2).replace('.', ',')}
                       </option>
                     ))}
                   </select>
@@ -325,34 +462,12 @@ export default function CoursePurchase() {
               </div>
             )}
 
-            {/* Payer Info */}
-            <div className="space-y-4 mb-6">
-              <div>
-                <Label>CPF</Label>
-                <Input
-                  type="text"
-                  value={paymentData.payer.identification.number}
-                  onChange={(e) => setPaymentData(prev => ({
-                    ...prev,
-                    payer: {
-                      ...prev.payer,
-                      identification: {
-                        ...prev.payer.identification,
-                        number: e.target.value
-                      }
-                    }
-                  }))}
-                  placeholder="000.000.000-00"
-                />
-              </div>
-            </div>
-
             <Button
               className="w-full"
               onClick={handlePayment}
-              disabled={loading}
+              disabled={processingPayment}
             >
-              {loading ? 'Processando...' : 'Finalizar Compra'}
+              {processingPayment ? 'Processando...' : 'Finalizar Compra'}
             </Button>
           </div>
         </div>

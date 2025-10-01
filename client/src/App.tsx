@@ -26,6 +26,8 @@ import CourseDetails from "./pages/Courses/CourseDetails";
 import CoursePurchase from "./pages/Courses/CoursePurchase";
 import LessonForm from "./pages/Lessons/LessonForm";
 import PeopleList from "./pages/People/PeopleList";
+import CheckoutList from "./pages/Checkouts/CheckoutList";
+import AuditList from "./pages/Audit/AuditList";
 import StudentLayout from "./pages/Student/StudentLayout";
 import StudentDashboard from "./pages/Student/StudentDashboard";
 import StudentCourses from "./pages/Student/StudentCourses";
@@ -102,6 +104,20 @@ export default function App() {
             <Route path="/people" element={
               <ProtectedRoute allowedRoles={['client']}>
                 <PeopleList />
+              </ProtectedRoute>
+            } />
+
+            {/* Checkouts */}
+            <Route path="/checkouts" element={
+              <ProtectedRoute allowedRoles={['client', 'teacher']}>
+                <CheckoutList />
+              </ProtectedRoute>
+            } />
+
+            {/* Audit */}
+            <Route path="/audit" element={
+              <ProtectedRoute allowedRoles={['client']}>
+                <AuditList />
               </ProtectedRoute>
             } />
 

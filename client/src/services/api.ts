@@ -53,6 +53,10 @@ class ApiService {
     if (response.accessToken) {
       this.token = response.accessToken;
       localStorage.setItem('token', response.accessToken);
+      
+      // Fazer segunda requisição para obter dados do usuário
+      const userResponse = await this.me();
+      return userResponse;
     }
 
     return response;
@@ -72,6 +76,18 @@ class ApiService {
     this.userId = null;
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
+  }
+
+  // Teachers
+  async getTeachers(queryParams?: any) {
+    const params = queryParams ? `?queryParams=${encodeURIComponent(JSON.stringify(queryParams))}` : '';
+    return this.request<any>(`/teachers${params}`);
+  }
+
+  // Students
+  async getStudents(queryParams?: any) {
+    const params = queryParams ? `?queryParams=${encodeURIComponent(JSON.stringify(queryParams))}` : '';
+    return this.request<any>(`/students${params}`);
   }
 
   // Courses
@@ -180,6 +196,30 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify({ enrollment }),
     });
+  }
+
+  // Checkouts
+  async getCheckouts(queryParams?: any) {
+    const params = queryParams ? `?queryParams=${encodeURIComponent(JSON.stringify(queryParams))}` : '';
+    return this.request<any>(`/payments${params}`);
+  }
+
+  // Card Token
+  async createCardToken(cardData: any) {
+    const publicKey = 'TEST-c5ec2c52-51c2-40d4-95db-68bcc5e9bf82';
+    const response = await fetch(`https://api.mercadopago.com/v1/card_tokens?public_key=${publicKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cardData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao criar token do cartão');
+    }
+
+    return response.json();
   }
 
   // Payments

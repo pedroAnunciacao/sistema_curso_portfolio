@@ -17,7 +17,8 @@ export default function CourseForm() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    image: ''
+    image: '',
+    price: ''
   });
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
@@ -35,7 +36,8 @@ export default function CourseForm() {
       setFormData({
         title: course.title,
         description: course.description,
-        image: course.image || ''
+        image: course.image || '',
+        price: course.price || ''
       });
       if (course.image) {
         setImagePreview(course.image);
@@ -109,6 +111,19 @@ export default function CourseForm() {
               onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
               placeholder="Digite a descrição do curso"
               rows={4}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="price">Preço (R$)</Label>
+            <Input
+              id="price"
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.price}
+              onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
+              placeholder="0,00"
             />
           </div>
 
