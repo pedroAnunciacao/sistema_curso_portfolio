@@ -20,7 +20,7 @@ class TeacherRepository implements TeacherRepositoryInterface
     {
 
         $query = $this->model::query();
-        $teachers = $query->with(['person;'])->paginate(10);
+        $teachers = $query->with(['person'])->paginate(10);
         return $teachers;
     }
 

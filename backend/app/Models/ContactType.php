@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class ContactType extends Model
 {
-        protected $table = 'contacts_types';
+    protected $table = 'contacts_types';
+
+    protected $fillable = [
+        'name'
+    ];
 
     public $timestamps = false;
-
 }

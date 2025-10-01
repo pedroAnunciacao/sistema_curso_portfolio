@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Resources\Checkout\CheckoutResource;
 
 class PaymentController extends Controller
 {
@@ -23,31 +24,31 @@ class PaymentController extends Controller
     }
 
 
-    public function processPixPayment(ProcessPixPaymentRequest $request): JsonResponse
+    public function processPixPayment(ProcessPixPaymentRequest $request)
     {
         try {
             $data = $this->service->processPixPayment($request->paymentPix);
-            return response()->json(['message' => 'PIX criado com sucesso!', 'data' => $data]);
+            return new CheckoutResource($data);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Pix', $request->all());
         }
     }
 
-    public function processCardPayment(ProcessCardPaymentRequest $request): JsonResponse
+    public function processCardPayment(ProcessCardPaymentRequest $request)
     {
         try {
             $data = $this->service->processCardPayment($request->paymentCard);
-            return response()->json(['message' => 'Pagamento com cartão aprovado!', 'data' => $data]);
+            return new CheckoutResource($data);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Card', $request->all());
         }
     }
 
-    public function ProcessBoletoPayment(ProcessBoletoPaymentRequest $request): JsonResponse
+    public function ProcessBoletoPayment(ProcessBoletoPaymentRequest $request)
     {
         try {
             $data = $this->service->ProcessBoletoPayment($request->paymentBoleto);
-            return response()->json(['message' => 'Boleto criado com sucesso!', 'data' => $data]);
+            return new CheckoutResource($data);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Boleto', $request->all());
         }

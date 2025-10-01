@@ -23,7 +23,7 @@ class Person extends Model implements AuditableInterface
 
     public function addresses()
     {
-        return $this->hasOne(Address::class)->where('is_default', true);
+        return $this->hasOne(Address::class)->where('is_default', 1);
     }
 
     public function contacts()

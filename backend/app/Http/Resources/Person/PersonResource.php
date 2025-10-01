@@ -8,6 +8,7 @@ use App\Http\Resources\Client\ClientResource;
 use App\Http\Resources\Teacher\TeacherResource;
 use App\Http\Resources\Student\StudentResource;
 use App\Http\Resources\Addresses\AddressesResource;
+use App\Http\Resources\Contact\ContactResource;
 use Mockery\Undefined;
 
 class PersonResource extends JsonResource
@@ -33,6 +34,7 @@ class PersonResource extends JsonResource
             ),
 
             'Addresses' => new AddressesResource($this->whenLoaded('addresses')),
+            'Contacts' =>  ContactResource::collection($this->whenLoaded('contacts')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -24,7 +24,8 @@ class Course extends Model implements AuditableInterface
         'title',
         'description',
         'teacher_id',
-        'image'
+        'image',
+        'price'
     ];
 
 
@@ -49,4 +50,23 @@ class Course extends Model implements AuditableInterface
     {
         return $this->belongsToMany(Student::class, 'enrollments')->withTimestamps();
     }
+
+
+        // Mutator para salvar preço corretamente
+    public function setPriceAttribute($value)
+    {
+        if ($value !== null) {
+            // Converte vírgula para ponto
+            $value = str_replace(',', '.', $value);
+        }
+
+        $this->attributes['price'] = $value;
+    }
+
+    // Accessor para formatar ao exibir (opcional)
+    public function getPriceAttribute($value)
+    {
+        return number_format($value, 2, ',', '.'); // Ex: 1.234,56
+    }
+
 }

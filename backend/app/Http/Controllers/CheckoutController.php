@@ -25,9 +25,9 @@ class CheckoutController extends Controller
         return CheckoutResource::collection($checkouts);
     }
 
-    public function show(int|string $courseId)
+    public function show(int|string $id)
     {
-        $checkout = $this->service->show($courseId);
+        $checkout = $this->service->show($id);
         return new CheckoutResource($checkout);
     }
 

@@ -18,6 +18,8 @@ class UpdateCourseRequest extends FormRequest
             'course.title' => 'nullable|string|max:255',
             'course.description' => 'nullable|string',
             'course.image' => 'nullable|string',
+            'course.price' => 'nullable|numeric|min:0',
+
         ];
     }
 }

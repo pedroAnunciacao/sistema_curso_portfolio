@@ -8,8 +8,10 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AuditController;
-
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\StudentController;
+
 use App\Http\Middleware\BindRequestFilter;
 
 /*
@@ -37,6 +39,7 @@ Route::prefix('payments')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth:api', BindRequestFilter::class])->group(function () {
+
     
     /*
     |--------------------------------------------------------------------------
@@ -53,13 +56,21 @@ Route::middleware(['auth:api', BindRequestFilter::class])->group(function () {
     });
 
 
-     /*
+    /*
     |--------------------------------------------------------------------------
     | Audit Module
     |--------------------------------------------------------------------------
     */
     Route::prefix('audit')->group(function () {
         Route::get('/', [AuditController::class, 'index']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Audit payment
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('payments')->group(function () {
     });
 
     /*
@@ -73,6 +84,25 @@ Route::middleware(['auth:api', BindRequestFilter::class])->group(function () {
         Route::put('/', [PersonController::class, 'update']);
         Route::get('{personId}', [PersonController::class, 'show']);
         Route::delete('{personId}', [PersonController::class, 'destroy']);
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | teacher Module
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('teachers')->group(function () {
+        Route::get('/', [TeacherController::class, 'index']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | student Module
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('students')->group(function () {
+        Route::get('/', [StudentController::class, 'index']);
     });
 
     /*
@@ -111,4 +141,5 @@ Route::middleware(['auth:api', 'checkout'])->prefix('payments')->group(function 
     Route::post('pix', [PaymentController::class, 'processPixPayment']);
     Route::post('credit-card', [PaymentController::class, 'processCardPayment']);
     Route::post('boleto', [PaymentController::class, 'processBoletoPayment']);
+    Route::get('/', [CheckoutController::class, 'index']);
 });

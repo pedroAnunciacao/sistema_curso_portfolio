@@ -25,7 +25,7 @@ class AuthController extends Controller
         ]);
 
         $response = app()->handle($request);
-        $content = json_decode($response->getContent(), true); // decodifica como array
+        $content = json_decode($response->getContent(), true);
 
         if (isset($content['error'])) {
             return response()->json([
@@ -57,8 +57,10 @@ class AuthController extends Controller
         }
 
         if($user->person->student){
-           $user->loadMissing('person.student'); 
+           $user->loadMissing('person.student', 'person.addresses', 'person.contacts'); 
+
         }
+
 
         return new UserResource($user);
     }
