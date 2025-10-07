@@ -11,10 +11,15 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableInterface;
 use App\Models\Concerns\BelongsToTeacher;
 use App\Models\Concerns\BelongsToClient;
 use App\Models\Concerns\BelongsToStudent;
+use App\Events\CheckoutCreated;
 
 class Checkout extends Model implements AuditableInterface
 {
     use SoftDeletes, Auditable, HasFactory, BelongsToClient, BelongsToTeacher, BelongsToStudent;
+
+        protected $dispatchesEvents = [
+        'created' => CheckoutCreated::class,
+    ];
 
     protected $fillable = [
         'transaction_id',

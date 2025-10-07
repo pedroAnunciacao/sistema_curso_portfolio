@@ -9,6 +9,7 @@ use App\Http\Controllers\PersonController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\WebhooksController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\StudentController;
 
@@ -29,8 +30,8 @@ Route::prefix('auth')->group(function () {
 | WebHooks
 |--------------------------------------------------------------------------
 */
-Route::prefix('payments')->group(function () {
-    Route::post('postback', [PaymentController::class, 'postback']);
+Route::prefix('webhooks')->group(function () {
+    Route::post('postback/mercadopago', [WebhooksController::class, 'postbackMercadoPago']);
 });
 
 /*

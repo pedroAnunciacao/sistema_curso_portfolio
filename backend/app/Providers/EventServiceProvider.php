@@ -16,8 +16,8 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        Events\CheckoutProcessed::class => [
-            Listeners\SendEmailCheckoutNotification::class
+        Events\CheckoutCreated::class => [
+            Listeners\SendCheckoutEmail::class
         ],
     ];
 

@@ -67,7 +67,13 @@ class PaymentController extends Controller
     }
 
 
-    public function postback(Request $request)
+    public function postbackMercadoPago(Request $request)
+    {
+        $this->service->postbackMercadoPago($request);
+    }
+
+
+        public function postback(Request $request)
     {
         $this->service->postback($request);
     }

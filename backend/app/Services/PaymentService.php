@@ -9,6 +9,7 @@ use App\Traits\ResolvesTransactionId;
 use App\Traits\ResolveTeacherIdForModelType;
 use App\Services\CheckoutService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PaymentService
 {
@@ -104,8 +105,17 @@ class PaymentService
         }
     }
 
-    public function postback(Request $request)
+    public function postbackMercadoPago(Request $request)
     {
+        Log::log([$request->all()]);
+
+        response()->noContent();
+    }
+
+        public function postback(Request $request)
+    {
+        Log::info($request);
+
         response()->noContent();
     }
 }
