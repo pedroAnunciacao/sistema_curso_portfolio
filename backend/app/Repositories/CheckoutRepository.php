@@ -56,7 +56,7 @@ class CheckoutRepository implements CheckoutRepositoryInterface
 
     public function update(array $data)
     {
-        $checkout = $this->model->findOrFail($data['checkout_id']);
+        $checkout = $this->model->findOrFail($data['id']);
         $checkout->update($data);
         return $checkout;
     }

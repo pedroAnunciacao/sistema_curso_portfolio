@@ -5,20 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableInterface;
 use App\Models\Concerns\BelongsToTeacher;
 use App\Models\Concerns\BelongsToClient;
 use App\Models\Concerns\BelongsToStudent;
 use App\Events\CheckoutCreated;
+use App\Events\CheckoutUpdateted;
 
 class Checkout extends Model implements AuditableInterface
 {
     use SoftDeletes, Auditable, HasFactory, BelongsToClient, BelongsToTeacher, BelongsToStudent;
 
-        protected $dispatchesEvents = [
+    protected $dispatchesEvents = [
         'created' => CheckoutCreated::class,
+        'updated' => CheckoutUpdateted::class,
     ];
 
     protected $fillable = [

@@ -19,6 +19,11 @@ class EventServiceProvider extends ServiceProvider
         Events\CheckoutCreated::class => [
             Listeners\SendCheckoutEmail::class
         ],
+
+        Events\CheckoutUpdateted::class => [
+            Listeners\SendCheckoutEmailPayment::class
+        ],
+
     ];
 
     /**
